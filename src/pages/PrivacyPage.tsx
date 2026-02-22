@@ -50,16 +50,15 @@ export default function PrivacyPage() {
           <InformationContainer>
             <Title>Nerimity Privacy Policy</Title>
             <Text opacity={0.8} size={14}>
-              Last updated: 20 February 2026
+              Last updated: 20 February 2026{" "}
+              <a
+                href="https://github.com/Nerimity/nerimity-web/commits/main/src/pages/PrivacyPage.tsx"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View policy history
+              </a>
             </Text>
-            <CustomLink
-              decoration
-              href="https://github.com/Nerimity/nerimity-web/commits/main/src/pages/PrivacyPage.tsx"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View policy history
-            </CustomLink>
             <Text opacity={0.6} size={14}>
               If you have questions or notice something missing, you may email
               us at{" "}
