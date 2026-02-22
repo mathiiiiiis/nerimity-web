@@ -135,9 +135,13 @@
                 "publishServer": "Publică serverul",
                 "verify": "Verificare",
                 "role": "Roluri",
-                "welcome-screen": "Ecran de bun venir",
-                "channel": "Canel",
-                "notifications": "notificări"
+                "welcome-screen": "Ecran de bun venit",
+                "channel": "Canal",
+                "notifications": "notificări",
+                "audit-logs": "Jurnale de audit",
+                "permissions": "Permisiuni",
+                "emoji": "Emoji",
+                "external-embed": "Încorporare externă"
             },
             "general": {
                 "serverRenameNotice": "Veți pierde toate avantajele de a avea serverul verificat dacă îl redenumiți.",
@@ -190,6 +194,18 @@
                 "bumpServerDescription": "Bump-uiește acest server ca să ajungi în top.",
                 "publishServerButton": "Publică serverul",
                 "unpublishServerButton": "Anulați publicarea server-ului"
+            },
+            "bans": {
+                "sort": {
+                    "alphabetical": "Alfabetic",
+                    "unsorted": "Nesortat"
+                },
+                "noResults": "Niciun rezultat găsit.",
+                "reason": "Motiv",
+                "noReason": "Niciun motiv furnizat",
+                "bannedAt": "Banat la",
+                "unknown": "Necunoscut",
+                "unban": "Unbanat"
             }
         },
         "rolePermissions": {
@@ -334,7 +350,9 @@
             "avatar": "Avatar",
             "banner": "Banner",
             "browse": "Navighează",
-            "supportedFileTypes": "Suportat: {{extensions}}, Maxim {{size}}"
+            "supportedFileTypes": "Suportat: {{extensions}}, Maxim {{size}}",
+            "revert": "Revenire",
+            "remove": "Elimină"
         },
         "searchPlaceholder": "Căutare",
         "backButton": "Înapoi",
@@ -453,6 +471,15 @@
             "body": "Trebuie să-ți legi contul de Google Drive pentru a încărca imagini mari, videoclipuri sau fișiere",
             "linkButton": "Leagă acum",
             "cancelButton": "Nu Lega"
+        },
+        "gifPicker": {
+            "search": "Caută {{platform}}",
+            "noResults": "Nu s-au găsit GIF-uri",
+            "favorites": {
+                "title": "Favorite",
+                "search": "Caută Favorite",
+                "noFavorites": "Încă nu ai favorite"
+            }
         }
     },
     "inputFieldActions": {
@@ -489,6 +516,9 @@
     },
     "editFolderModal": {
         "title": "Editează Fișa",
-        "placeholder": "Numele Fișei"
+        "placeholder": "Numele Fișei",
+        "errors": {
+            "emptyName": "Te rugăm să introduci un nume de folder."
+        }
     }
 }
