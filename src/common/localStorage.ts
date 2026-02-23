@@ -14,6 +14,7 @@ export const StorageKeys = {
   LAST_SEEN_CHANNEL_NOTICES: "lastSeenChannelNotices",
   PROGRAM_ACTIVITY_STATUS: "programActivityStatus",
   BLUR_EFFECT_ENABLED: "blurEffectEnabled",
+  REDUCE_MOTION_MODE: "reduceMotionMode",
   ENABLED_EXPERIMENTS: "enabledExperiments",
   DISABLED_ADVANCED_MARKUP: "disabledAdvancedMarkup",
   NOTIFICATION_SOUNDS: "notificationSounds",

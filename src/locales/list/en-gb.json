@@ -732,6 +732,8 @@
       "enableOnce": "Enable Once",
       "blurEffect": "Blur Effect",
       "blurEffectDescription": "Toggle blur effect on interface elements. (May Reduce Performance)",
+      "reduceAnimations": "Reduce Animations",
+      "reduceAnimationsDescription": "Prevent animated GIFs and emojis from playing until hovered or tapped.",
       "disableAdvancedMarkupBar": "Disable Advanced Markup Bar",
       "disableAdvancedMarkupBarDescription": "Prevent the advanced markup bar from appearing.",
       "rightDrawerMode": "Right Drawer Mode",
