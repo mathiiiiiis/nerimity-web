@@ -23,7 +23,7 @@ import MemberContextMenu from "../member-context-menu/MemberContextMenu";
 import { DrawerHeader } from "@/components/drawer-header/DrawerHeader";
 import { useCustomPortal } from "@/components/ui/custom-portal/CustomPortal";
 import { css } from "solid-styled-components";
-import useUsers, { bannerUrl } from "@/chat-api/store/useUsers";
+import useUsers, { bannerUrl, User } from "@/chat-api/store/useUsers";
 import Text from "@/components/ui/Text";
 import Icon from "@/components/ui/icon/Icon";
 import Button from "@/components/ui/Button";
@@ -59,6 +59,7 @@ import { VirtualList } from "../ui/VirtualList";
 import { Fonts, getFont } from "@/common/fonts";
 import { Channel } from "@/chat-api/store/useChannels";
 import { matchSorter } from "match-sorter";
+import { ServerRole } from "@/chat-api/store/useServerRoles";
 
 const MemberItem = (props: {
   member: ServerMember;
@@ -517,94 +518,115 @@ const BannerItem = (props: { hovered: boolean }) => {
   );
 };
 
+interface MemberData {
+  member: ServerMember;
+  username: string;
+  user: User;
+}
 const ServerDrawer = () => {
   const params = useParams<{ serverId?: string; channelId?: string }>();
   const { servers, serverRoles, channels, serverMembers, users } = useStore();
-  const server = () => servers.get(params.serverId!);
-  const channel = () => channels.get(params.channelId!);
 
-  const roles = () => serverRoles.getAllByServerId(params.serverId!);
+  const server = createMemo(() => servers.get(params.serverId!));
+  const channel = createMemo(() => channels.get(params.channelId!));
+  const roles = createMemo(() =>
+    serverRoles.getAllByServerId(params.serverId!)
+  );
+  const defaultRoleId = createMemo(() => server()?.defaultRoleId);
 
-  const members = createMemo(
+  const rawMembers = createMemo(
     () =>
       channel()?.membersWithChannelAccess() ||
       serverMembers.array(params.serverId!)
   );
 
-  const roleMembers = mapArray(roles, (role) => {
-    const membersInThisRole = () =>
-      members().filter((member) => {
-        const user = users.get(member?.userId!);
-        const unhiddenRole = serverMembers.unhiddenRole(member!);
-        if (!user) return false;
-        if (!user.presence()?.status) return false;
-        if (server()?.defaultRoleId === role!.id && !unhiddenRole) return true;
-        if (unhiddenRole?.id === role!.id) return true;
-      });
+  const processedGroups = createMemo(() => {
+    const list = rawMembers() as ServerMember[];
+    const defRole = defaultRoleId();
 
-    return { role, members: createMemo(() => membersInThisRole()) };
+    const groups = new Map<string, MemberData[]>();
+    const offline: MemberData[] = [];
+
+    for (const member of list) {
+      const user = users.get(member?.userId!);
+      if (!user) continue;
+
+      const presence = user.presence();
+      const username = user.username || "";
+      const status = presence?.status;
+
+      const memberData = { member, username, user };
+
+      if (!status) {
+        offline.push(memberData);
+        continue;
+      }
+
+      const unhiddenRole = serverMembers.unhiddenRole(member!);
+      let targetRoleId = unhiddenRole?.id;
+
+      if (!unhiddenRole && defRole) {
+        targetRoleId = defRole;
+      }
+
+      if (targetRoleId) {
+        if (!groups.has(targetRoleId)) groups.set(targetRoleId, []);
+        groups.get(targetRoleId)!.push(memberData);
+      }
+    }
+
+    const sortFn = (a: MemberData, b: MemberData) =>
+      a.username.localeCompare(b.username);
+
+    offline.sort(sortFn);
+    groups.forEach((members) => members.sort(sortFn));
+
+    return { groups, offline };
   });
 
-  const offlineMembers = createMemo(() =>
-    members().filter(
-      (member) => !users.get(member?.userId!)?.presence()?.status
-    )
+  const roleMembers = mapArray(roles, (role) => {
+    const members = createMemo(
+      () => processedGroups().groups.get(role!.id) || []
+    );
+    return { role: role as ServerRole, members };
+  });
+
+  const offlineMembers = createMemo(() => processedGroups().offline);
+
+  const defaultRole = createMemo(() =>
+    serverRoles.get(server()?.id!, defaultRoleId()!)
   );
-  const defaultRole = () =>
-    serverRoles.get(server()?.id!, server()?.defaultRoleId!);
+
   return (
     <Show when={params.channelId} keyed={true}>
       <Delay ms={10}>
-        <>
-          <div
-            style={{
-              "margin-left": "8px",
-              "margin-top": "8px",
-              display: "flex"
-            }}
-          >
-            <Text size={14}>{t("informationDrawer.members")}</Text>
-            <div class={styles.memberCount}>
-              {members().length.toLocaleString()}
-            </div>
+        <div
+          style={{ "margin-left": "8px", "margin-top": "8px", display: "flex" }}
+        >
+          <Text size={14}>{t("informationDrawer.members")}</Text>
+          <div class={styles.memberCount}>
+            {rawMembers().length.toLocaleString()}
           </div>
-          <div class={styles.roleContainer}>
-            <For each={roleMembers()}>
-              {(item) => (
-                <Show when={!item.role!.hideRole && item.members().length}>
-                  <RoleItem
-                    members={item
-                      .members()
-                      .sort(
-                        (a, b) =>
-                          users
-                            .get(a?.userId!)
-                            ?.username.localeCompare(
-                              users.get(b?.userId!)?.username || ""
-                            ) || 0
-                      )}
-                    roleName={item.role?.name!}
-                    roleIcon={item.role?.icon!}
-                  />
-                </Show>
-              )}
-            </For>
+        </div>
+        <div class={styles.roleContainer}>
+          <For each={roleMembers()}>
+            {(item) => (
+              <Show when={!item.role.hideRole && item.members().length > 0}>
+                <RoleItem
+                  members={item.members().map((m) => m.member)}
+                  roleName={item.role.name}
+                  roleIcon={item.role.icon}
+                />
+              </Show>
+            )}
+          </For>
 
-            {/* Offline */}
-            <RoleItem
-              members={offlineMembers().sort(
-                (a, b) =>
-                  users
-                    .get(a?.userId!)
-                    ?.username.localeCompare(
-                      users.get(b?.userId!)!.username || ""
-                    ) || 0
-              )}
-              roleName={t("status.offline")}
-              roleIcon={defaultRole()?.icon}
-            />
-          </div>
-        </>
+          <RoleItem
+            members={offlineMembers().map((m) => m.member)}
+            roleName={t("status.offline")}
+            roleIcon={defaultRole()?.icon}
+          />
+        </div>
       </Delay>
     </Show>
   );
