@@ -61,7 +61,9 @@ import {
   initializeGoogleDrive
 } from "@/common/driveAPI";
 import { Skeleton } from "@/components/ui/skeleton/Skeleton";
-import { ServerMember } from "@/chat-api/store/useServerMembers";
+import useServerMembers, {
+  ServerMember
+} from "@/chat-api/store/useServerMembers";
 import { Dynamic, Portal } from "solid-js/web";
 import { Emoji as RoleEmoji } from "@/components/ui/Emoji";
 import { prettyBytes } from "@/common/prettyBytes";
@@ -145,14 +147,17 @@ function FloatOptions(props: FloatingOptionsProps) {
     if (!params.serverId) return false;
 
     const member = serverMembers.get(params.serverId, account.user()?.id!);
-    return member?.hasPermission?.(ROLE_PERMISSIONS.MANAGE_CHANNELS);
+    return serverMembers.hasPermission(
+      member!,
+      ROLE_PERMISSIONS.MANAGE_CHANNELS
+    );
   };
 
   const showReply = () => {
     if (props.message.type !== MessageType.CONTENT) return false;
     const channel = channels.get(props.message.channelId!);
     return channel?.canSendMessage(account.user()?.id!);
-  }
+  };
 
   return (
     <div class={cn(styles.floatOptions, "floatOptions")}>
@@ -223,10 +228,12 @@ interface DetailsProps {
 }
 
 const Details = (props: DetailsProps) => {
+  const serverMembers = useServerMembers();
   const [t] = useTransContext();
 
-  const topRoleWithColor = createMemo(() =>
-    props.serverMember?.topRoleWithColor()
+  const topRoleWithColor = createMemo(
+    () =>
+      props.serverMember && serverMembers.topRoleWithColor(props.serverMember)
   );
   const font = createMemo(() =>
     getFont(props.message.createdBy.profile?.font || 0)
@@ -273,7 +280,12 @@ const Details = (props: DetailsProps) => {
       >
         {props.serverMember?.nickname || props.message.createdBy.username}
       </CustomLink>
-      <Show when={props.serverMember?.topRoleWithIcon()}>
+      <Show
+        when={
+          props.serverMember &&
+          serverMembers.topRoleWithIcon(props.serverMember)
+        }
+      >
         {(role) => (
           <RoleEmoji
             title={role().name}
@@ -394,8 +406,11 @@ const MessageItem = (props: MessageItemProps) => {
     if (!params.serverId) return false;
     const member = serverMember();
     if (!member) return false;
-    if (member.isServerCreator()) return true;
-    return member.hasPermission?.(ROLE_PERMISSIONS.MENTION_EVERYONE);
+    if (serverMembers.isServerCreator(member)) return true;
+    return serverMembers.hasPermission(
+      member,
+      ROLE_PERMISSIONS.MENTION_EVERYONE
+    );
   };
 
   const updateTranslation = async () => {
@@ -441,10 +456,15 @@ const MessageItem = (props: MessageItemProps) => {
             (m) => m.replyToMessage?.createdBy?.id === account.user()?.id
           );
           const isRoleMentioned =
-            serverMember()?.hasPermission(ROLE_PERMISSIONS.MENTION_ROLES) &&
+            serverMember() &&
+            serverMembers.hasPermission(
+              serverMember()!,
+              ROLE_PERMISSIONS.MENTION_ROLES
+            ) &&
             props.message.roleMentions.find(
               (r) =>
-                r.id !== server()?.defaultRoleId && selfMember()?.hasRole(r.id)
+                r.id !== server()?.defaultRoleId &&
+                serverMembers.hasRole(selfMember()!, r.id)
             );
           const isMentioned =
             isEveryoneMentioned ||
@@ -1443,10 +1463,7 @@ const GoogleDriveFileEmbed = (props: { attachment: RawAttachment }) => {
 
 const inviteCache = new Map<string, ServerWithMemberCount | false>();
 
-export function ServerInviteEmbed(props: {
-  code?: string;
-  emojiId?: string;
-}) {
+export function ServerInviteEmbed(props: { code?: string; emojiId?: string }) {
   const navigate = useNavigate();
   const { servers, serverMembers } = useStore();
   const [t] = useTransContext();
@@ -1457,8 +1474,11 @@ export function ServerInviteEmbed(props: {
 
   const { joinByInviteCode, joinPublicById, joining } = useJoinServer();
 
-  const cacheId = props.code ? `invite/${props.code}`
-    : props.emojiId ? `emoji/${props.emojiId}` : "";
+  const cacheId = props.code
+    ? `invite/${props.code}`
+    : props.emojiId
+      ? `emoji/${props.emojiId}`
+      : "";
 
   const serverDetailsByEmoji = async (emojiId: string) => {
     const cachedEmoji = servers
@@ -1467,7 +1487,7 @@ export function ServerInviteEmbed(props: {
 
     const serverId = cachedEmoji?.serverId;
     if (serverId) {
-      const server = servers.get(serverId)
+      const server = servers.get(serverId);
       if (server) {
         return {
           memberCount: (serverMembers.array(serverId) || []).length,
@@ -1486,8 +1506,7 @@ export function ServerInviteEmbed(props: {
   };
 
   onMount(async () => {
-    if (inviteCache.has(cacheId))
-      return setInvite(inviteCache.get(cacheId)!);
+    if (inviteCache.has(cacheId)) return setInvite(inviteCache.get(cacheId)!);
 
     let invite;
     if (props.code) {
@@ -1534,7 +1553,9 @@ export function ServerInviteEmbed(props: {
           <div class={styles.serverInviteLoading}>
             <Switch fallback={t("invite.loading")}>
               <Match when={invite() === false && props.emojiId}>
-                <span class={styles.serverInvitePrivate}>{t("invite.privateEmoji")}</span>
+                <span class={styles.serverInvitePrivate}>
+                  {t("invite.privateEmoji")}
+                </span>
               </Match>
               <Match when={invite() === false}>
                 <Icon name="error" color="var(--alert-color)" />
@@ -2053,7 +2074,9 @@ const MessageReplyItem = (props: {
       props.replyToMessage?.createdBy?.id!
     );
 
-  const topRoleWithColor = createMemo(() => member()?.topRoleWithColor());
+  const topRoleWithColor = createMemo(
+    () => member() && store.serverMembers.topRoleWithColor(member()!)
+  );
 
   const hasAttachments = () => props.replyToMessage?.attachments?.length;
 

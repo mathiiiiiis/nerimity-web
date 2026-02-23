@@ -38,7 +38,6 @@ export type Channel = Omit<RawChannel, "recipient"> & {
   setRecipientId(this: Channel, userId: string): void;
   update: (this: Channel, update: Partial<RawChannel>) => void;
 
-  permissionList: typeof permissionList;
   membersWithChannelAccess: typeof membersWithChannelAccess;
   recipient: typeof recipient;
   recipientId?: string;
@@ -73,7 +72,6 @@ const set = (channel: RawChannel & { lastSeen?: number }) => {
     recipient,
     hasNotifications,
     membersWithChannelAccess,
-    permissionList,
     mentionCount,
     updateLastSeen,
     updateLastMessaged,
@@ -91,12 +89,6 @@ const set = (channel: RawChannel & { lastSeen?: number }) => {
   setChannels(channel.id, newChannel);
 };
 
-function permissionList(this: Channel) {
-  const permissions = this.permissions || 0;
-
-  return getAllPermissions(CHANNEL_PERMISSIONS, permissions);
-}
-
 function permissionBits(
   this: Channel,
   defaultRoleOnly = false,
@@ -106,12 +98,13 @@ function permissionBits(
 
   const account = useAccount();
   const serverMembers = useServerMembers();
+  const servers = useServers();
   const member = serverMembers.get(
     this.serverId,
     userId || (account.user()?.id as string)
   );
 
-  const defaultRoleId = member?.server().defaultRoleId;
+  const defaultRoleId = servers.get(member?.serverId!)?.defaultRoleId;
 
   if (defaultRoleOnly) {
     const permissions = this.permissions?.find(
@@ -160,7 +153,7 @@ function canSendMessage(this: Channel, userId: string) {
   }
   if (!this.serverId) return true;
   if (!member) return false;
-  if (member?.hasPermission(ROLE_PERMISSIONS.ADMIN)) return true;
+  if (serverMembers.hasPermission(member, ROLE_PERMISSIONS.ADMIN)) return true;
 
   if (muted) return false;
 
@@ -168,7 +161,7 @@ function canSendMessage(this: Channel, userId: string) {
     return false;
   }
 
-  return member?.hasPermission(ROLE_PERMISSIONS.SEND_MESSAGE);
+  return serverMembers.hasPermission(member, ROLE_PERMISSIONS.SEND_MESSAGE);
 }
 
 function mentionCount(this: Channel) {
@@ -190,7 +183,10 @@ function hasNotifications(this: Channel) {
       this.serverId,
       account.user()?.id as string
     );
-    const hasAdminPermission = member?.hasPermission(ROLE_PERMISSIONS.ADMIN);
+    const hasAdminPermission = serverMembers.hasPermission(
+      member!,
+      ROLE_PERMISSIONS.ADMIN
+    );
     if (!hasAdminPermission) return false;
   }
 
@@ -318,7 +314,10 @@ const serverChannelsWithPerm = () => {
   return array().filter((channel) => {
     if (!channel.serverId) return;
     const member = serverMembers.get(channel.serverId, account.user()?.id!);
-    const hasAdminPerm = member?.hasPermission(ROLE_PERMISSIONS.ADMIN);
+    const hasAdminPerm = serverMembers.hasPermission(
+      member!,
+      ROLE_PERMISSIONS.ADMIN
+    );
     if (hasAdminPerm) return true;
 
     const isPrivateChannel = !channel.hasPermission(
@@ -338,7 +337,10 @@ const getChannelsByServerId = (
   const serverMembers = useServerMembers();
   const account = useAccount();
   const member = serverMembers.get(serverId, account.user()?.id!);
-  const hasAdminPerm = member?.hasPermission(ROLE_PERMISSIONS.ADMIN);
+  const hasAdminPerm = serverMembers.hasPermission(
+    member!,
+    ROLE_PERMISSIONS.ADMIN
+  );
   if (hasAdminPerm)
     return array().filter((channel) => channel?.serverId === serverId);
 
@@ -379,7 +381,7 @@ function membersWithChannelAccess(this: Channel) {
 
   const serverMembers = members.array(this.serverId);
   return serverMembers.filter((member) =>
-    member?.canViewChannel(this.id)
+    members.canViewChannel(member!, this.id)
   ) as ServerMember[];
 }
 

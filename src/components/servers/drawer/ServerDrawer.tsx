@@ -283,7 +283,7 @@ function CategoryItem(props: {
 
   const member = () => serverMembers.get(params.serverId, account.user()?.id!);
   const hasModeratorPermission = () =>
-    member()?.hasPermission(ROLE_PERMISSIONS.MANAGE_CHANNELS);
+    serverMembers.hasPermission(member()!, ROLE_PERMISSIONS.MANAGE_CHANNELS);
 
   const sortedServerChannels = createMemo(() =>
     channels
@@ -293,7 +293,7 @@ function CategoryItem(props: {
 
   const isPrivateCategory = () => {
     const user = member();
-    if (user?.hasPermission(ROLE_PERMISSIONS.MANAGE_CHANNELS)) {
+    if (serverMembers.hasPermission(user!, ROLE_PERMISSIONS.MANAGE_CHANNELS)) {
       return false;
     }
 

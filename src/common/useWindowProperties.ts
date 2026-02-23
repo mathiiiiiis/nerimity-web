@@ -10,7 +10,7 @@ const [windowProperties, setWindowProperties] = createStore({
   height: window.innerHeight,
   paneWidth: null as null | number,
   hasFocus: document.hasFocus(),
-  reduceMotion: motionQuery.matches,
+  reduceMotion: motionQuery.matches
 });
 
 window.addEventListener("resize", () => {
@@ -45,27 +45,25 @@ const [blurEffectEnabled, setBlurEffectEnabled] = useLocalStorage(
 
 export type ReduceMotionMode = "enabled" | "disabled" | "auto";
 
-const [reduceMotionMode, setReduceMotionMode] = useLocalStorage<ReduceMotionMode>(
-  StorageKeys.REDUCE_MOTION_MODE,
-  "auto"
-);
+const [reduceMotionMode, setReduceMotionMode] =
+  useLocalStorage<ReduceMotionMode>(StorageKeys.REDUCE_MOTION_MODE, "auto");
 
 const [paneBackgroundColor, setPaneBackgroundColor] = createSignal<
   undefined | string
 >(undefined);
+
+const userReduceMotion = createMemo(() => {
+  const mode = reduceMotionMode();
+  const reduceMotion =
+    mode == "auto" ? windowProperties.reduceMotion : mode == "enabled";
+  return reduceMotion;
+});
 
 export function useWindowProperties() {
   const isWindowFocusedAndBlurEffectEnabled = () => {
     if (!windowProperties.hasFocus) return false;
     return blurEffectEnabled();
   };
-
-  const userReduceMotion = createMemo(() => {
-    const mode = reduceMotionMode();
-    const reduceMotion = mode == "auto" ? windowProperties.reduceMotion
-      : mode == "enabled";
-    return reduceMotion;
-  });
 
   return {
     blurEffectEnabled,
@@ -83,11 +81,11 @@ export function useWindowProperties() {
     hasFocus: () => windowProperties.hasFocus,
     reduceMotion: userReduceMotion,
     shouldAnimate: (hover: boolean = false) => {
-      return windowProperties.hasFocus && (hover || !userReduceMotion())
+      return windowProperties.hasFocus && (hover || !userReduceMotion());
     },
     isMobileAgent: () => isMobileAgent,
     isSafari,
     paneBackgroundColor,
-    setPaneBackgroundColor,
+    setPaneBackgroundColor
   };
 }

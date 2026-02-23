@@ -16,12 +16,14 @@ import {
   onMount,
   Show
 } from "solid-js";
-import { ServerMember } from "@/chat-api/store/useServerMembers";
+import useServerMembers, {
+  ServerMember
+} from "@/chat-api/store/useServerMembers";
 import MemberContextMenu from "../member-context-menu/MemberContextMenu";
 import { DrawerHeader } from "@/components/drawer-header/DrawerHeader";
 import { useCustomPortal } from "@/components/ui/custom-portal/CustomPortal";
 import { css } from "solid-styled-components";
-import { bannerUrl } from "@/chat-api/store/useUsers";
+import useUsers, { bannerUrl } from "@/chat-api/store/useUsers";
 import Text from "@/components/ui/Text";
 import Icon from "@/components/ui/icon/Icon";
 import Button from "@/components/ui/Button";
@@ -62,8 +64,10 @@ const MemberItem = (props: {
   member: ServerMember;
   style: JSX.CSSProperties;
 }) => {
+  const users = useUsers();
+  const serverMembers = useServerMembers();
   const params = useParams<{ serverId: string }>();
-  const user = () => props.member.user();
+  const user = () => users.get(props.member.userId)!;
   let elementRef: undefined | HTMLDivElement;
   const [contextPosition, setContextPosition] = createSignal<
     { x: number; y: number } | undefined
@@ -81,10 +85,15 @@ const MemberItem = (props: {
   };
 
   const isAdmin = () => {
-    return props.member.hasPermission(ROLE_PERMISSIONS.ADMIN, false, true);
+    return serverMembers.hasPermission(
+      props.member,
+      ROLE_PERMISSIONS.ADMIN,
+      false,
+      true
+    );
   };
   const isCreator = () => {
-    return props.member.isServerCreator();
+    return serverMembers.isServerCreator(props.member);
   };
 
   const onClick = (e: MouseEvent) => {
@@ -104,11 +113,11 @@ const MemberItem = (props: {
     );
   };
 
-  const topRoleWithColor = createMemo(() => props.member.topRoleWithColor());
-
-  const font = createMemo(() =>
-    getFont(props.member.user().profile?.font || 0)
+  const topRoleWithColor = createMemo(() =>
+    serverMembers.topRoleWithColor(props.member)
   );
+
+  const font = createMemo(() => getFont(user().profile?.font || 0));
 
   return (
     <div
@@ -510,7 +519,7 @@ const BannerItem = (props: { hovered: boolean }) => {
 
 const ServerDrawer = () => {
   const params = useParams<{ serverId?: string; channelId?: string }>();
-  const { servers, serverRoles, channels, serverMembers } = useStore();
+  const { servers, serverRoles, channels, serverMembers, users } = useStore();
   const server = () => servers.get(params.serverId!);
   const channel = () => channels.get(params.channelId!);
 
@@ -525,18 +534,21 @@ const ServerDrawer = () => {
   const roleMembers = mapArray(roles, (role) => {
     const membersInThisRole = () =>
       members().filter((member) => {
-        if (!member?.user()) return false;
-        if (!member?.user().presence()?.status) return false;
-        if (server()?.defaultRoleId === role!.id && !member?.unhiddenRole())
-          return true;
-        if (member?.unhiddenRole()?.id === role!.id) return true;
+        const user = users.get(member?.userId!);
+        const unhiddenRole = serverMembers.unhiddenRole(member!);
+        if (!user) return false;
+        if (!user.presence()?.status) return false;
+        if (server()?.defaultRoleId === role!.id && !unhiddenRole) return true;
+        if (unhiddenRole?.id === role!.id) return true;
       });
 
     return { role, members: createMemo(() => membersInThisRole()) };
   });
 
   const offlineMembers = createMemo(() =>
-    members().filter((member) => !member?.user().presence()?.status)
+    members().filter(
+      (member) => !users.get(member?.userId!)?.presence()?.status
+    )
   );
   const defaultRole = () =>
     serverRoles.get(server()?.id!, server()?.defaultRoleId!);
@@ -563,8 +575,13 @@ const ServerDrawer = () => {
                   <RoleItem
                     members={item
                       .members()
-                      .sort((a, b) =>
-                        a?.user().username.localeCompare(b?.user().username)
+                      .sort(
+                        (a, b) =>
+                          users
+                            .get(a?.userId!)
+                            ?.username.localeCompare(
+                              users.get(b?.userId!)?.username || ""
+                            ) || 0
                       )}
                     roleName={item.role?.name!}
                     roleIcon={item.role?.icon!}
@@ -575,8 +592,13 @@ const ServerDrawer = () => {
 
             {/* Offline */}
             <RoleItem
-              members={offlineMembers().sort((a, b) =>
-                a?.user().username.localeCompare(b?.user().username)
+              members={offlineMembers().sort(
+                (a, b) =>
+                  users
+                    .get(a?.userId!)
+                    ?.username.localeCompare(
+                      users.get(b?.userId!)!.username || ""
+                    ) || 0
               )}
               roleName={t("status.offline")}
               roleIcon={defaultRole()?.icon}
@@ -718,7 +740,7 @@ const SearchInputBox = (props: {
       userSearchQuery(),
       {
         keys: [
-          (e) => normalizeText(e?.user?.().username),
+          (e) => normalizeText(store.users.get(e?.userId!)?.username),
           (e) => normalizeText(e?.nickname!)
         ]
       }
@@ -781,8 +803,15 @@ const SearchInputBox = (props: {
                 }}
                 onClick={() => handleSuggestUserClick(member!)}
               >
-                <Avatar size={24} user={member?.user()} resize={28} />
-                <div>{member?.nickname || member?.user()?.username}</div>
+                <Avatar
+                  size={24}
+                  user={store.users.get(member?.userId!)}
+                  resize={28}
+                />
+                <div>
+                  {member?.nickname ||
+                    store.users.get(member?.userId!)?.username}
+                </div>
               </div>
             )}
           </For>
@@ -800,8 +829,15 @@ const SearchInputBox = (props: {
                   );
                 }}
               >
-                <Avatar size={20} user={member?.user()} resize={28} />
-                <div>{member?.nickname || member?.user()?.username}</div>
+                <Avatar
+                  size={20}
+                  user={store.users.get(member?.userId!)}
+                  resize={28}
+                />
+                <div>
+                  {member?.nickname ||
+                    store.users.get(member?.userId!)?.username}
+                </div>
                 <Icon
                   name="close"
                   size={18}

@@ -51,7 +51,7 @@ import FileBrowser, { FileBrowserRef } from "../ui/FileBrowser";
 import { fileToDataUrl } from "@/common/fileToDataUrl";
 import { matchSorter } from "match-sorter";
 import ItemContainer from "../ui/LegacyItem";
-import { User } from "@/chat-api/store/useUsers";
+import useUsers, { User } from "@/chat-api/store/useUsers";
 import Avatar from "../ui/Avatar";
 import useChannelProperties from "@/chat-api/store/useChannelProperties";
 import { Emoji } from "../markup/Emoji";
@@ -395,7 +395,7 @@ function MessageArea(props: {
   const isAdmin = () => {
     if (!channel()?.serverId) return;
     const member = serverMembers.get(channel()?.serverId!, account.user()?.id!);
-    return member?.hasPermission(ROLE_PERMISSIONS.ADMIN);
+    return serverMembers.hasPermission(member!, ROLE_PERMISSIONS.ADMIN);
   };
 
   const sendMessage = () => {
@@ -1117,7 +1117,9 @@ function SlowModeIndicator() {
   const isAdmin = () => {
     if (!channel()?.serverId) return;
     const member = serverMembers.get(channel()?.serverId!, account.user()?.id!);
-    return member?.hasPermission(ROLE_PERMISSIONS.ADMIN);
+    return (
+      member && serverMembers.hasPermission(member, ROLE_PERMISSIONS.ADMIN)
+    );
   };
 
   const [currentSlowModeMs, setCurrentSlowModeMs] = createSignal(0);
@@ -1238,7 +1240,7 @@ function FloatingReply() {
           <Checkbox
             checked={globalMention()}
             onChange={toggleMention}
-            style={{gap: "4px"}}
+            style={{ gap: "4px" }}
             boxStyles={{ "font-size": "8px", "border-radius": "4px" }}
             label={t("messageArea.mention")}
             labelSize={12}
@@ -1249,7 +1251,7 @@ function FloatingReply() {
             <div
               class={styles.replyIndicatorInner}
               style={{
-                "border-top": "solid 1px rgba(255, 255, 255, 0.1)",
+                "border-top": "solid 1px rgba(255, 255, 255, 0.1)"
               }}
             >
               <Icon
@@ -1459,6 +1461,7 @@ export function formatMessage(
   const account = useAccount();
   const servers = useServers();
   const roles = useServerRoles();
+  const users = useUsers();
 
   const serverRoles = roles.getAllByServerId(serverId!);
 
@@ -1518,11 +1521,12 @@ export function formatMessage(
       userMentionRegex,
       (match, username, tag) => {
         const member = members.find((member) => {
-          const user = member?.user();
+          const user = users.get(member?.userId!);
           return user && user.username === username && user.tag === tag;
         });
         if (!member) return match;
-        return `[@:${member.user().id}]`;
+        const user = users.get(member.userId!);
+        return `[@:${user?.id}]`;
       }
     );
     finalString = finalString.replace(roleMentionRegex, (match, group) => {
@@ -1541,13 +1545,11 @@ export function formatMessage(
     );
 
     if (isSomeoneMentioned) {
-      finalString = finalString.replaceAll(
-        "@someone",
-        () =>
-          `[@:s] **${randomKaomoji()} (${
-            members[randomIndex(members.length)]?.user().username
-          })**`
-      );
+      finalString = finalString.replaceAll("@someone", () => {
+        const randomMember = members[randomIndex(members.length)];
+        const user = users.get(randomMember?.userId!);
+        return `[@:s] **${randomKaomoji()} (${user?.username})**`;
+      });
     }
   }
 
@@ -1779,7 +1781,8 @@ function FloatingUserSuggestions(props: {
   textArea?: HTMLTextAreaElement;
 }) {
   const params = useParams<{ serverId?: string; channelId: string }>();
-  const { serverMembers, channels, account, serverRoles, servers } = useStore();
+  const { serverMembers, channels, account, serverRoles, servers, users } =
+    useStore();
 
   const server = createMemo(() => servers.get(params.serverId!));
 
@@ -1792,13 +1795,19 @@ function FloatingUserSuggestions(props: {
   const hasPermissionToMentionEveryone = () => {
     if (!params.serverId) return false;
     const member = serverMembers.get(params.serverId, account.user()?.id!);
-    return member?.hasPermission?.(ROLE_PERMISSIONS.MENTION_EVERYONE);
+    return (
+      member &&
+      serverMembers.hasPermission(member, ROLE_PERMISSIONS.MENTION_EVERYONE)
+    );
   };
 
   const hasPermissionToMentionRoles = () => {
     if (!params.serverId) return false;
     const member = serverMembers.get(params.serverId, account.user()?.id!);
-    return member?.hasPermission?.(ROLE_PERMISSIONS.MENTION_ROLES);
+    return (
+      member &&
+      serverMembers.hasPermission(member, ROLE_PERMISSIONS.MENTION_ROLES)
+    );
   };
 
   const searchedServerUsers = () =>
@@ -1880,7 +1889,9 @@ function FloatingUserSuggestions(props: {
   };
 
   const onEnterClick = (i: number) => {
-    onUserClick((searched()[i] as ServerMember)?.user?.() || searched()[i]);
+    const member = searched()[i] as ServerMember;
+    const user = users.get(member?.userId!);
+    onUserClick(user || searched()[i]);
   };
 
   const [current, , , setCurrent] = useSelectedSuggestion(
@@ -1899,7 +1910,7 @@ function FloatingUserSuggestions(props: {
               onHover={() => setCurrent(i())}
               selected={current() === i()}
               nickname={normalizeText(member?.nickname)}
-              user={(member as ServerMember)?.user?.() || member}
+              user={users.get(member?.userId!) || member}
               onclick={onUserClick}
             />
           )}
@@ -2095,7 +2106,10 @@ function FloatingCommandSuggestions(props: {
       if (!bot) return false;
       if (cmd.permissions === null) return true;
 
-      return member()?.hasPermission({ bit: cmd.permissions });
+      return (
+        member() &&
+        serverMembers.hasPermission(member()!, { bit: cmd.permissions })
+      );
     });
 
     return availableCmds;

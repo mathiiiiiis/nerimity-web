@@ -911,14 +911,20 @@ function MessageContextMenu(props: MessageContextMenuProps) {
     if (!params.serverId) return false;
 
     const member = serverMembers.get(params.serverId, account.user()?.id!);
-    return member?.hasPermission?.(ROLE_PERMISSIONS.MANAGE_CHANNELS);
+    return serverMembers.hasPermission(
+      member!,
+      ROLE_PERMISSIONS.MANAGE_CHANNELS
+    );
   };
 
   const showPin = () => {
     if (props.message.type !== MessageType.CONTENT) return false;
     if (!params.serverId) return true;
     const member = serverMembers.get(params.serverId, account.user()?.id!);
-    return member?.hasPermission?.(ROLE_PERMISSIONS.MANAGE_CHANNELS);
+    return serverMembers.hasPermission(
+      member!,
+      ROLE_PERMISSIONS.MANAGE_CHANNELS
+    );
   };
 
   const showQuote = () => {
