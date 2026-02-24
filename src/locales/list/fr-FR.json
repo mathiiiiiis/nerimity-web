@@ -2,7 +2,7 @@
     "header": {
         "openAppButton": "Ouvrir l'appli",
         "loginButton": "Se connecter",
-        "joinNowButton": "Rejoindre maintenant",
+        "joinNowButton": "Rejoindre Maintenant",
         "logoutButton": "Déconnexion"
     },
     "homePage": {
@@ -448,7 +448,9 @@
             "reminderDescription": "Notifications pour les rappels.",
             "inAppPreview": "Dans l'aperçu de l'application",
             "inAppPreviewDescription": "Afficher les notifications contextuelles dans l'application.",
-            "mute": "Muet("
+            "mute": "Muet(",
+            "callJoin": "Rejoindre Appel",
+            "callLeave": "Quitter Appel"
         },
         "badges": {
             "noticeTitle": "Dons",
@@ -497,7 +499,17 @@
             "pushToTalk": "Appuyer pour parler",
             "bindButton": "Lier",
             "stopButton": "Arrêt",
-            "downloadAppNotice": "Téléchargez l'application de bureau Nerimity pour utiliser cette fonctionnalité sans avoir à sélectionner un onglet de fenêtre."
+            "downloadAppNotice": "Téléchargez l'application de bureau Nerimity pour utiliser cette fonctionnalité sans avoir à sélectionner un onglet de fenêtre.",
+            "inputConstraints": {
+                "echoCancelation": "Annulation de l'Echo",
+                "echoCancelationDescription": "Empêche le micro de capter les sons des haut-parleurs.",
+                "noiseSuppression": "Suppression du Bruit",
+                "noiseSuppressionDescription": "Filtre les bruits de fond constants. (ventilos, etc.).",
+                "autoGainControl": "Volume Auto",
+                "autoGainControlDescription": "Ajuste automatiquement le volume pour maintenir un signal cohérent."
+            },
+            "useTurn": "Utiliser les Serveurs Cloudflare TURN",
+            "useTurnDescription": "Utiliser les serveurs TURN pour une meilleure connexion"
         },
         "connections": {
             "thirdParty": {
@@ -542,7 +554,9 @@
             "swipeToOpen": "Glissez pour ouvrir",
             "swipeToOpenDescription": "Ouvrez le tiroir de droite en balayant depuis le bord droit. Cela désactivera la fonction « balayer pour répondre ».",
             "headerTapToOpen": "Appuyez sur l'en-tête pour ouvrir",
-            "headerTapToOpenDescription": "Ouvrez le tiroir de droite en cliquant sur l'en-tête. Cela vous permettra de balayer pour répondre."
+            "headerTapToOpenDescription": "Ouvrez le tiroir de droite en cliquant sur l'en-tête. Cela vous permettra de balayer pour répondre.",
+            "reduceAnimations": "Réduire les Animations",
+            "reduceAnimationsDescription": "Ne pas jouer les GIFs animés et émojis tant qu'ils ne sont pas survolés ou touchés."
         },
         "window": {
             "downloadAppNotice": "Pour modifier ces paramètres, vous devez télécharger l'application de bureau Nerimity.",
@@ -841,7 +855,16 @@
             "linkButton": "Lier maintenant",
             "cancelButton": "Ne pas lier"
         },
-        "emailNotice": "Veuillez confirmer votre adresse e-mail pour envoyer des messages."
+        "emailNotice": "Veuillez confirmer votre adresse e-mail pour envoyer des messages.",
+        "gifPicker": {
+            "search": "Rechercher {{platform}}",
+            "noResults": "Aucun GIFs trouvés",
+            "favorites": {
+                "title": "Favoris",
+                "search": "Rechercher les favoris",
+                "noFavorites": "Aucun favoris pour le moment"
+            }
+        }
     },
     "markup": {
         "color": "Couleur",
@@ -1086,7 +1109,8 @@
         "invalid": "Code d'invitation invalide",
         "joinButton": "Rejoindre",
         "joiningButton": "en train de rejoindre…",
-        "visitButton": "Visiter"
+        "visitButton": "Visiter",
+        "privateEmoji": "Cet emoji vient d'un serveur privé."
     },
     "fileEmbed": {
         "expired": "Éxpiré {{time}}",
@@ -1148,7 +1172,20 @@
             "leave": "Partir",
             "muted": "En sourdine",
             "deafened": "Assourdi",
-            "fullscreen": "Plein écran"
+            "fullscreen": "Plein écran",
+            "webcamModal": {
+                "title": "Partager la Webcam",
+                "error": "Le partage de caméra a échoué",
+                "shareCameraButton": "Partager la Caméra"
+            },
+            "screenShareModal": {
+                "title": "Partage d'écran",
+                "quality": "Qualitéé",
+                "framerate": "Images par seconde",
+                "shareSystemAudio": "Partager l'audio système",
+                "shareAppAudio": "Partager l'audio de l'application",
+                "chooseWindowButton": "Choisir une fenêtre"
+            }
         }
     },
     "inVoiceActions": {
@@ -1224,7 +1261,9 @@
             "avatar": "Avatar",
             "banner": "Bannière",
             "supportedFileTypes": "Prise en charge : {{extensions}}, Taille maximale : {{size}}",
-            "browse": "Parcourir"
+            "browse": "Parcourir",
+            "remove": "Enlever",
+            "revert": "Revenir"
         },
         "undoButton": "Défaire",
         "closeButton": "Fermer",
@@ -1295,5 +1334,9 @@
         "title": "Réponse de {{botName}}",
         "dataReceiver": "Les données sont envoyées à {{botName}}",
         "notice": "Ne partagez jamais d'informations sensibles"
+    },
+    "serverDrawer": {
+        "joinedThisSessionNoticeSetToMentionsOnly": "Mentions uniquement",
+        "joinedThisSessionNotice": "Vous entendrez toutes les notifications sonores provenant de ce serveur."
     }
 }
