@@ -1,4 +1,4 @@
-import { getStorageString, StorageKeys } from "./localStorage";
+import { getStorageObject, StorageKeys } from "./localStorage";
 import { localRPC } from "./LocalRPC";
 import { t } from "@nerimity/i18lite";
 
@@ -89,8 +89,7 @@ async function fetchNowPlaying(username: string, apiKey: string): Promise<void> 
 
 export const useLastFmActivityTracker = () => {
   const start = () => {
-    const username = getStorageString(StorageKeys.LASTFM_USERNAME, "");
-    const apiKey = getStorageString(StorageKeys.LASTFM_API_KEY, "");
+    const { username, apiKey } = getStorageObject(StorageKeys.LASTFM, { username: "", apiKey: ""});
     if (!username || !apiKey) return;
     if (pollIntervalId !== null) return;
 

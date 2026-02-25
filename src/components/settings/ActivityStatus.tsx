@@ -26,6 +26,7 @@ import Block from "../ui/settings-block/Block";
 import {
   getStorageObject,
   getStorageString,
+  setStorageObject,
   setStorageString,
   StorageKeys,
   useLocalStorage,
@@ -554,16 +555,12 @@ const DiscordServerJoinedConfirmModal = (props: {
 
 const LastFmActivity = () => {
   const lastFmTracker = useLastFmActivityTracker();
-  const [username, setUsername] = createSignal<string>(
-    getStorageString(StorageKeys.LASTFM_USERNAME, "")
-  );
-  const [apiKey, setApiKey] = createSignal<string>(
-    getStorageString(StorageKeys.LASTFM_API_KEY, "")
-  );
+  const lastfm = getStorageObject(StorageKeys.LASTFM, { username: "", apiKey: "" });
+  const [username, setUsername] = createSignal<string>(lastfm.username);
+  const [apiKey, setApiKey] = createSignal<string>(lastfm.apiKey);
 
   const onBlur = () => {
-    setStorageString(StorageKeys.LASTFM_USERNAME, username().trim());
-    setStorageString(StorageKeys.LASTFM_API_KEY, apiKey().trim());
+    setStorageObject(StorageKeys.LASTFM, { username: username().trim(), apiKey: apiKey().trim() });
     lastFmTracker.restart();
   };
 
