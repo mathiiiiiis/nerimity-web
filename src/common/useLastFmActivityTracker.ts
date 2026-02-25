@@ -51,7 +51,6 @@ async function fetchNowPlaying(username: string, apiKey: string): Promise<void> 
       lastTrackKey = null;
       return;
     }
-    }
 
     const track = data.recenttracks.track[0];
     if (!track) return;
