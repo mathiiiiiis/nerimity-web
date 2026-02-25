@@ -28,6 +28,7 @@ export const StorageKeys = {
   PTTBoundKeys: "pttBoundKeys",
   USE_TWITTER_EMBED: "useTwitterEmbed",
   DISCORD_USER_ID: "discordUserId",
+  LASTFM: "lastfm",
   SIDEBAR_WIDTH: "sidebarWidth",
   LEFT_DRAWER_WIDTH: "leftDrawerWidth",
   RIGHT_DRAWER_WIDTH: "rightDrawerWidth",
