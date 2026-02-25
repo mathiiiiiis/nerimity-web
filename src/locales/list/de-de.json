@@ -669,7 +669,11 @@
             "serverModal": {
                 "text": "Bitte tritt dem Discord-Server bei, um Aktivitätsfreigabe zu aktivieren.",
                 "doneButton": "Ich bin beigetreten"
-            }
+            },
+            "lastfmActivity": "Last.fm Aktivität",
+            "lastfmActivityDescription": "Teile, was du gerade hörst, durch Last.fm",
+            "lastfmUsernamePlaceholder": "Last.fm Nutzername",
+            "lastfmApiKeyPlaceholder": "Last.fm API Schlüssel"
         },
         "developer": {
             "oauth2": {
