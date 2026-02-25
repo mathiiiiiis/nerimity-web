@@ -1844,7 +1844,8 @@ function FloatingUserSuggestions(props: {
       normalizeText(props.search),
       {
         keys: [
-          (e) => normalizeText(e.user?.().username),
+          (e) => normalizeText(e.user?.()?.username),
+          (e) => normalizeText(users.get(e.userId)?.username),
           (e) => normalizeText(e.nickname),
           (e) => normalizeText(e.name)
         ]
@@ -1890,7 +1891,7 @@ function FloatingUserSuggestions(props: {
 
   const onEnterClick = (i: number) => {
     const member = searched()[i] as ServerMember;
-    const user = users.get(member?.userId!);
+    const user = member.user?.() || users.get(member?.userId!);
     onUserClick(user || searched()[i]);
   };
 
@@ -1910,7 +1911,7 @@ function FloatingUserSuggestions(props: {
               onHover={() => setCurrent(i())}
               selected={current() === i()}
               nickname={normalizeText(member?.nickname)}
-              user={users.get(member?.userId!) || member}
+              user={member.user?.() || users.get(member?.userId!) || member}
               onclick={onUserClick}
             />
           )}
