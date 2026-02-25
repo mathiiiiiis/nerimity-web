@@ -2,7 +2,7 @@ import { getStorageString, StorageKeys } from "./localStorage";
 import { localRPC } from "./LocalRPC";
 
 const LASTFM_APP_ID = "lastfm-activity-tracker";
-const POLL_INTERVALS_MS = 15000;
+const POLL_INTERVAL_MS = 15000;
 
 let pollIntervalId: ReturnType<typeof setInterval> | null = null;
 let lastTrackKey: string | null = null;
@@ -87,7 +87,7 @@ export const useLastFmActivityTracker = () => {
     fetchNowPlaying(username, apiKey);
     pollIntervalId = setInterval(() => {
       fetchNowPlaying(username, apiKey);
-    }, POLL_INTERVALS_MS);
+    }, POLL_INTERVAL_MS);
   };
 
   const restart = () => {
