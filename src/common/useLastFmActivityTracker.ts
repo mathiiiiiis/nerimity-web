@@ -37,10 +37,20 @@ async function fetchNowPlaying(username: string, apiKey: string): Promise<void> 
 
     const data: LastFmResponse = await response.json();
 
-    if (data.error || !data.recenttracks?.track?.length) {
+    const PERMANENT_ERRORS = new Set([6, 10, 13]); // invalid user, invalid key, invalid method
+    if (data.error) {
+      if (PERMANENT_ERRORS.has(data.error)) {
+        localRPC.updateRPC(LASTFM_APP_ID);
+        lastTrackKey = null;
+      }
+      // transient errors (e.g., rate limit) preserve existing activity
+      return;
+    }
+    if (!data.recenttracks?.track?.length) {
       localRPC.updateRPC(LASTFM_APP_ID);
       lastTrackKey = null;
       return;
+    }
     }
 
     const track = data.recenttracks.track[0];
