@@ -41,6 +41,7 @@ import { Modal } from "../ui/modal";
 import { emojiShortcodeToUnicode } from "@/emoji";
 import { emojiToUrl } from "@/common/emojiToUrl";
 import { useDiscordActivityTracker } from "@/common/useDiscordActivityTracker";
+import { useLastFmActivityTracker } from "@/common/useLastFmActivityTracker";
 import { UserActivity } from "../user-activity/UserActivity";
 
 const Container = styled("div")`
@@ -197,6 +198,7 @@ export default function WindowSettings() {
         </FlexRow>
       </RPCAdContainer>
       <DiscordActivity />
+      <LastFmActivity />
 
       <Show when={!isElectron}>
         <Notice
@@ -547,5 +549,44 @@ const DiscordServerJoinedConfirmModal = (props: {
         />
       </Modal.Footer>
     </Modal.Root>
+  );
+};
+
+const LastFmActivity = () => {
+  const lastFmTracker = useLastFmActivityTracker();
+  const [username, setUsername] = createSignal<string>(
+    getStorageString(StorageKeys.LASTFM_USERNAME, "")
+  );
+  const [apiKey, setApiKey] = createSignal<string>(
+    getStorageString(StorageKeys.LASTFM_API_KEY, "")
+  );
+
+  const onBlur = () => {
+    setStorageString(StorageKeys.LASTFM_USERNAME, username().trim());
+    setStorageString(StorageKeys.LASTFM_API_KEY, apiKey().trim());
+    lastFmTracker.restart();
+  };
+
+  return (
+    <SettingsBlock
+      label={t("settings.activity.lastfmActivity")}
+      description={t("settings.activity.lastfmActivityDescription")}
+      header
+    >
+      <FlexColumn gap={6}>
+        <Input
+          placeholder={t("settings.activity.lastfmUsernamePlaceholder")}
+          onText={setUsername}
+          value={username()}
+          onBlur={onBlur}
+        />
+        <Input
+          placeholder={t("settings.activity.lastfmApiKeyPlaceholder")}
+          onText={setApiKey}
+          value={apiKey()}
+          onBlur={onBlur}
+        />
+      </FlexColumn>
+    </SettingsBlock>
   );
 };

@@ -785,7 +785,11 @@
       "serverModal": {
         "text": "Please join the Discord server to enable Activity Sharing.",
         "doneButton": "I have joined"
-      }
+      },
+      "lastfmActivity": "Last.fm Activity",
+      "lastfmActivityDescription": "Share what you're listening to via Last.fm",
+      "lastfmUsernamePlaceholder": "Last.fm Username",
+      "lastfmApiKeyPlaceholder": "Last.fm API Key"
     },
     "developer": {
       "applicationsDescription": "Create Nerimity Bots.",
