@@ -1344,6 +1344,8 @@
     "duration": "for {{duration}}",
     "relativeFuture": "in {{duration}}",
     "relativePast": "{{duration}} ago",
-    "relativeNow": "now"
+    "relativeNow": "now",
+    "yesterdayTime": "Yesterday at {{time}}",
+    "dateTime": "{{date}} at {{time}}"
   }
 }

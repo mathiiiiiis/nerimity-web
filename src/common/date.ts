@@ -42,6 +42,22 @@ export const formatters = createMemo(() => {
         seconds: "2-digit",
       }),
     },
+    datetime: {
+      longDate: new Intl.DateTimeFormat(lang, {
+        dateStyle: "full",
+        timeStyle: "short",
+        hour12: timeFormat() === "12hr",
+      }),
+      mediumDate: new Intl.DateTimeFormat(lang, {
+        dateStyle: "medium",
+        timeStyle: "short",
+        hour12: timeFormat() === "12hr",
+      }),
+      seconds: new Intl.DateTimeFormat(lang, {
+        timeStyle: "medium",
+        hour12: timeFormat() === "12hr",
+      }),
+    },
     relative: new Intl.RelativeTimeFormat(lang, {
       numeric: "auto",
     }),
@@ -111,62 +127,39 @@ function roundDuration(
   };
 }
 
-// make a function where if the number is less than 10, it will add a 0 in front of it
+// Format a message timestamp
+export function formatTimestamp(timestampMs: number, seconds = false) {
+  const today = Temporal.Now.zonedDateTimeISO();
+  const timestamp = Temporal.Instant.fromEpochMilliseconds(timestampMs)
+    .toZonedDateTimeISO(today.timeZoneId)
+    .round({
+      roundingMode: "trunc",
+      smallestUnit: "second",
+    });
 
-function pad(num: number) {
-  return num < 10 ? `0${num}` : num;
-}
+  const yesterday = today.subtract(Temporal.Duration.from({ days: 1 }));
+  const date = timestamp.toPlainDate();
 
-// convert timestamp to today at 13:00 or yesterday at 13:00 or date. add zero if single digit
-export function formatTimestamp(timestamp: number, seconds = false) {
-  const date = new Date(timestamp);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  const dateFormat = formatters().datetime.mediumDate;
+  const timeFormatSeconds = formatters().datetime.seconds;
 
-  const sameYear = today.getFullYear() === date.getFullYear();
-  const format = timeFormat(); 
-
-  const hours = date.getHours();
-  const minutes = pad(date.getMinutes());
-  const secondsText = seconds ? `:${pad(date.getSeconds())}` : "";
-
-  let formattedHours: string | number = hours;
-  let ampm = "";
-
-  if (format === "12hr") {
-    ampm = hours >= 12 ? " PM" : " AM";
-    formattedHours = hours % 12 || 12;
-  }
-
-  if (format === "24hr") {
-    formattedHours = pad(hours);
-  }
-
-  if (
-    sameYear &&
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth()
-  ) {
-    return `${formattedHours}:${minutes}${secondsText}${ampm}`;
-  } else if (sameYear && yesterday.toDateString() === date.toDateString()) {
-    return `Yesterday at ${formattedHours}:${minutes}${ampm}`;
+  if (date.equals(today.toPlainDate())) {
+    const formatter = seconds ? timeFormatSeconds : dateFormat;
+    return formatter.format(timestamp.toPlainTime());
+  } else if (date.equals(yesterday.toPlainDate())) {
+    return t("datetime.yesterdayTime", { time: dateFormat.format(timestamp.toPlainTime()) });
   } else {
-    return `${Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }).format(date)} at ${formattedHours}:${minutes}${ampm}`;
+    return t("datetime.dateTime", {
+      date: dateFormat.format(timestamp.toPlainDate()),
+      time: dateFormat.format(timestamp.toPlainTime()),
+    });
   }
 }
 
 export const fullDate = (timestamp: number) => {
-  return Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(timestamp);
+  const datetime = Temporal.Instant.fromEpochMilliseconds(timestamp)
+    .toZonedDateTimeISO(Temporal.Now.timeZoneId());
+  return formatters().datetime.longDate.format(datetime.toPlainDate());
 };
 
 export function getDaysAgo(timestamp: number) {
