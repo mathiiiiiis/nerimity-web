@@ -276,9 +276,9 @@ const MutedNotice = (props: { member: ServerMember }) => {
   const [expiresAt, setExpiresAt] = createSignal<string>("");
 
   const updateExpiresAt = () => {
-    const text = formatTimestampRelative(props.member.muteExpireAt!);
-
-    setExpiresAt(text.slice(3));
+    setExpiresAt(
+      formatTimestampRelative(props.member.muteExpireAt ?? 0, "none")
+    );
   };
 
   createEffect(
