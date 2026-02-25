@@ -1,5 +1,6 @@
 import { getStorageString, StorageKeys } from "./localStorage";
 import { localRPC } from "./LocalRPC";
+import { t } from "@nerimity/i18lite";
 
 const LASTFM_APP_ID = "lastfm-activity-tracker";
 const POLL_INTERVAL_MS = 15000;
@@ -73,7 +74,7 @@ async function fetchNowPlaying(username: string, apiKey: string): Promise<void> 
       undefined;
 
     localRPC.updateRPC(LASTFM_APP_ID, {
-      action: "Listening to",
+      action: t("activityNames.listening"),
       name: "Last.fm",
       title: track.name,
       subtitle: track.artist["#text"],
