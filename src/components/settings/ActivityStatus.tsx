@@ -558,6 +558,7 @@ const LastFmActivity = () => {
   const lastfm = getStorageObject(StorageKeys.LASTFM, { username: "", apiKey: "" });
   const [username, setUsername] = createSignal<string>(lastfm.username);
   const [apiKey, setApiKey] = createSignal<string>(lastfm.apiKey);
+  const [showApiKey, setShowApiKey] = createSignal(false);
 
   const onBlur = () => {
     setStorageObject(StorageKeys.LASTFM, { username: username().trim(), apiKey: apiKey().trim() });
@@ -582,6 +583,15 @@ const LastFmActivity = () => {
           onText={setApiKey}
           value={apiKey()}
           onBlur={onBlur}
+          type={showApiKey() ? "text" : "password"}
+          suffix={
+            <Icon
+              name={showApiKey() ? "visibility_off" : "visibility"}
+              size={18}
+              style={{ cursor: "pointer", opacity: 0.6, "padding-right": "10px", "flex-shrink": 0, "align-self": "center" }}
+              onClick={() => setShowApiKey(!showApiKey())}
+            />
+          }
         />
       </FlexColumn>
     </SettingsBlock>
