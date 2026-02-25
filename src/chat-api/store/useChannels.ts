@@ -11,7 +11,11 @@ import {
   ROLE_PERMISSIONS,
   addBit
 } from "../Bitwise";
-import { ChannelType, RawChannel } from "../RawData";
+import {
+  ChannelType,
+  RawChannel,
+  ServerNotificationPingMode
+} from "../RawData";
 import useMessages from "./useMessages";
 import useUsers from "./useUsers";
 import useServerMembers, { ServerMember } from "./useServerMembers";
@@ -177,6 +181,22 @@ function hasNotifications(this: Channel) {
   const mentions = useMention();
   const isAdminChannel = () =>
     !this.hasPermission(CHANNEL_PERMISSIONS.PUBLIC_CHANNEL);
+
+  const notifySettings = account.getRawNotificationSettings(this.id);
+
+  if (
+    notifySettings?.notificationPingMode === ServerNotificationPingMode.MUTE
+  ) {
+    return;
+  }
+
+  if (
+    notifySettings?.notificationPingMode ==
+    ServerNotificationPingMode.MENTIONS_ONLY
+  ) {
+    const hasMentions = mentions.get(this.id)?.count;
+    return hasMentions ? "mention" : false;
+  }
 
   if (this.serverId && isAdminChannel()) {
     const member = serverMembers.get(
