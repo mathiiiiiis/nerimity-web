@@ -239,7 +239,7 @@
                 "bumpServer": "Sunucuyu Öne Çıkar",
                 "bumpServerDescription": "Sunucuyu üste çıkartmak için sunucuyu öne çıkar.",
                 "publishServerButton": "Yayınla",
-                "unpublishServerButton": "Sunucuyu yayından kaldır",
+                "unpublishServerButton": "Yayından kaldır",
                 "bumpButton": "Öne Çıkar ({{count}})",
                 "descriptionLabel": "Sunucu Açıklaması ({{current}}/{{max}})",
                 "bumpCooldown": "Bu sunucuyu Öne Çıkartmak için {{hours}} saat, {{minutes}} dakika ve {{seconds}} saniye beklemeniz gerekiyor."
@@ -397,7 +397,7 @@
             "applications": "Uygulamalar",
             "experiments": "Deneysel Özellikler",
             "viewSource": "Kaynak Görüntüle",
-            "changelog": "Değişiklikler",
+            "changelog": "Değişiklik Kaydı",
             "window-settings": "İstemci Ayarları",
             "call-settings": "Arama Ayarları",
             "activity-status": "Aktivite Durumları",
@@ -629,7 +629,11 @@
             "serverModal": {
                 "text": "Etkinlik Paylaşımını etkinleştirmek için lütfen Discord sunucusuna katılın.",
                 "doneButton": "Katıldım"
-            }
+            },
+            "lastfmActivityDescription": "Last.fm aracılığıyla ne dinlediğinizi paylaşın",
+            "lastfmUsernamePlaceholder": "Last.fm Kullanıcı adı",
+            "lastfmApiKeyPlaceholder": "Last.fm API Anahtarı",
+            "lastfmActivity": "Last.fm Etkinliği"
         },
         "developer": {
             "oauth2": {
@@ -712,7 +716,7 @@
                 "ping": "Ping",
                 "sound": "Ses"
             },
-            "initial": "Başlangıç"
+            "initial": ""
         },
         "channelSettings": "Kanal Ayarları"
     },
@@ -824,9 +828,11 @@
         "editPostModalTitle": "Gönderiyi düzenle",
         "sort": {
             "latest": "En Son",
-            "mostLiked7Days": ""
+            "mostLiked7Days": "En Çok Beğenilen (7 gün)",
+            "mostLiked30Days": "En Çok Beğenilen (30 gün)",
+            "mostLikedAllTime": "En Çok Beğenilen (Tüm Zamanlar)"
         },
-        "replying": "<1>{{kullanıcı adı}}</1>'e yanıt"
+        "replying": ""
     },
     "informationDrawer": {
         "channelNotice": "Kanal Hatırlatması",
@@ -884,7 +890,15 @@
         "download": "Yükle",
         "expires": "",
         "expired": "",
-        "modifiedOrDeleted": "Bu dosya Google Drive'da yaratıcısı tarafından değiştirildi/silindi."
+        "modifiedOrDeleted": "Bu dosya Google Drive'da yaratıcısı tarafından değiştirildi/silindi.",
+        "fileExpired": "Dosyanın tarihi geçmiş.",
+        "fileModified": "Bu dosya değiştirilmiş.",
+        "couldNotGetFile": "Dosya alınamadı.",
+        "videoEmbed": {
+            "videoExpired": "Videonun süresi doldu.",
+            "videoModified": "Video değiştirildi.",
+            "couldNotGetVideo": "Video alınamıyor."
+        }
     },
     "message": {
         "badge": {
@@ -905,14 +919,23 @@
         "blocked": "Bu kullanıcıyı engelledin. Görmek için tıkla.",
         "translationError": "Bu mesaj çevrilemiyor.",
         "translation": {
-            "title": "Çeviri"
+            "title": "Çeviri",
+            "error": "Çeviri başarısız oldu"
         },
         "reactions": {
             "more": "{{count}} Daha Fazla"
         },
         "dismissButton": "Reddet",
         "editedAt": "Şu saatte düzenlendi: {{time}}",
-        "imageMessage": "Görüntü mesajı"
+        "imageMessage": "Görüntü mesajı",
+        "viewMessages": "Mesajları Görüntüle",
+        "quote": {
+            "invalid": "Silinen veya geçersiz alıntı.",
+            "nested": "İç içe yuvalanmış alıntı"
+        },
+        "codeBlock": {
+            "text": "Düz Metin"
+        }
     },
     "statusHeader": {
         "connected": "Bağlandı!",
@@ -1027,7 +1050,7 @@
         }
     },
     "deleteMessageModal": {
-        "title": "Mesajı Silecekmisin?",
+        "title": "Mesajı Sil?",
         "body": "Bu mesajı silmek ister misiniz?",
         "cancelButton": "Silme"
     },
@@ -1147,7 +1170,20 @@
             "leave": "Bağlantıyı Kes",
             "muted": "Susturulmuş",
             "deafened": "Sağırlaştırılmış",
-            "fullscreen": "Tam Ekran"
+            "fullscreen": "Tam Ekran",
+            "webcamModal": {
+                "title": "Webcam Paylaşımı",
+                "error": "Kamera paylaşılamadı",
+                "shareCameraButton": "Kamerayı Paylaş"
+            },
+            "screenShareModal": {
+                "title": "Ekran Paylaşımı",
+                "quality": "Kalite",
+                "framerate": "Kare Hızı",
+                "shareSystemAudio": "Sistem Sesini Paylaş",
+                "shareAppAudio": "Uygulama Sesini Paylaş",
+                "chooseWindowButton": "Pencere Seç"
+            }
         },
         "pins": {
             "noPins": "Sabitlenmiş Mesajlar yok"
@@ -1161,7 +1197,8 @@
         "members": {
             "filter": {
                 "24hours": "24 Saat",
-                "header": "Filtrele"
+                "header": "Filtrele",
+                "muted": "Susturulmuş"
             },
             "sort": {
                 "member": "Üye",
@@ -1175,7 +1212,8 @@
             }
         },
         "inVoice": "Sesli aramada",
-        "addChannel": "Kanal Ekle"
+        "addChannel": "Kanal Ekle",
+        "verified": "Bu sunucu doğrulanmış."
     },
     "general": {
         "searchPlaceholder": "Ara",
@@ -1203,7 +1241,7 @@
             "banner": "Afiş",
             "browse": "Göz At",
             "supportedFileTypes": "Desteklenen:{{extensions}}, Maks. {{size}}",
-            "revert": "Geri dön",
+            "revert": "Geri al",
             "remove": "Kaldır"
         }
     },
@@ -1261,7 +1299,7 @@
     },
     "muteModal": {
         "title": "{{username}}'yı sessize al?",
-        "message": "{{username}}</1> bu sunucuda <2>{{duration}}</2> süreyle konuşamayacak.",
+        "message": "",
         "banButton": "Sessize al",
         "banning": "Sessize alma…",
         "reasonLabel": "Sebep (isteğe bağlı)",
@@ -1269,5 +1307,10 @@
         "muteButton": "Sessize al",
         "unmuteButton": "Sesi aç",
         "cancelMute": "Sessize Almayın"
+    },
+    "addReminderModal": {
+        "title": "Hatırlatıcı",
+        "setReminderButton": "Hatırlatıcıyı Kur",
+        "adding": "Ekleniyor…"
     }
 }
