@@ -183,7 +183,7 @@ const sendAndStoreMessage = async (channelId: string, content?: string) => {
   if (!user) return;
 
   const localMessage: Message = {
-    id: "",
+    id: tempMessageId,
     tempId: tempMessageId,
     silent: isSilent,
     channelId,
