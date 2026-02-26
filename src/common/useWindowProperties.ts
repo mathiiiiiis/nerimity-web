@@ -85,6 +85,7 @@ export function useWindowProperties() {
     },
     isMobileAgent: () => isMobileAgent,
     isSafari,
+    isFirefox,
     paneBackgroundColor,
     setPaneBackgroundColor
   };
