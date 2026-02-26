@@ -1341,6 +1341,16 @@
     },
     "serverDrawer": {
         "joinedThisSessionNoticeSetToMentionsOnly": "Ustaw na same wzmianki",
-        "joinedThisSessionNotice": "Usłyszysz wszystkie dźwięki powiadomień z tego serwera."
+        "joinedThisSessionNotice": "Zobaczysz wszystkie powiadomienia z tego serwera."
+    },
+    "datetime": {
+        "lessThanAMinuteAgo": "kilka sekund temu",
+        "duration": "przez {{duration}}",
+        "relativeFuture": "za {{duration}}",
+        "relativePast": "{{duration}} temu",
+        "relativeNow": "teraz",
+        "yesterdayTime": "Wczoraj o {{time}}",
+        "dateTime": "{{date}} o {{time}}",
+        "error": "błąd"
     }
 }
