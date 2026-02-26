@@ -1,6 +1,6 @@
 import styles from "./styles.module.scss";
 import { classNames, cn, conditionalClass } from "@/common/classNames";
-import { formatTimestamp, fullDate, timeSinceMentions } from "@/common/date";
+import { formatTimestamp, fullDate, formatTimestampRelative } from "@/common/date";
 import Avatar from "@/components/ui/Avatar";
 import Icon from "@/components/ui/icon/Icon";
 import {
@@ -520,7 +520,7 @@ const MessageItem = (props: MessageItemProps) => {
     <>
       <Show when={isNewDay()}>
         <div class={styles.newDayMarker}>
-          {fullDate(props.message.createdAt, "long", "long")}
+          {fullDate(props.message.createdAt)}
         </div>
       </Show>
       <div
@@ -1268,10 +1268,10 @@ const VideoEmbed = (props: {
           />
           {props.error
             ? t("fileEmbed.expired", {
-                time: timeSinceMentions(props.file?.expireAt!)
+                time: formatTimestampRelative(props.file?.expireAt!)
               })
             : t("fileEmbed.expires", {
-                time: timeSinceMentions(props.file?.expireAt!)
+                time: formatTimestampRelative(props.file?.expireAt!)
               })}
         </div>
       </Show>
@@ -1413,10 +1413,10 @@ const FileEmbed = (props: {
           />
           {props.error
             ? t("fileEmbed.expired", {
-                time: timeSinceMentions(props.file?.expireAt!)
+                time: formatTimestampRelative(props.file?.expireAt!)
               })
             : t("fileEmbed.expires", {
-                time: timeSinceMentions(props.file?.expireAt!)
+                time: formatTimestampRelative(props.file?.expireAt!)
               })}
         </div>
       </Show>

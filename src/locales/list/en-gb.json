@@ -1342,5 +1342,14 @@
   "serverDrawer": {
     "joinedThisSessionNotice": "You'll see all notification sounds from this server.",
     "joinedThisSessionNoticeSetToMentionsOnly": "Set to mentions only"
+  },
+  "datetime": {
+    "lessThanAMinuteAgo": "a few seconds ago",
+    "duration": "for {{duration}}",
+    "relativeFuture": "in {{duration}}",
+    "relativePast": "{{duration}} ago",
+    "relativeNow": "now",
+    "yesterdayTime": "Yesterday at {{time}}",
+    "dateTime": "{{date}} at {{time}}"
   }
 }

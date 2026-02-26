@@ -872,8 +872,10 @@ function MessageContextMenu(props: MessageContextMenuProps) {
 
   const channel = () => channels.get(props.message.channelId!);
 
-  const hasMessageId = () => !props.message.local && props.message.sentStatus === undefined;
-  const sendFailed = () => props.message.sentStatus === MessageSentStatus.FAILED;
+  const hasMessageId = () =>
+    !props.message.local && props.message.sentStatus === undefined;
+  const sendFailed = () =>
+    props.message.sentStatus === MessageSentStatus.FAILED;
 
   const onDeleteClick = (e?: MouseEvent) => {
     createPortal?.((close) => (
@@ -927,7 +929,8 @@ function MessageContextMenu(props: MessageContextMenuProps) {
   };
 
   const showPin = () => {
-    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId())
+      return false;
     if (!params.serverId) return true;
     const member = serverMembers.get(params.serverId, account.user()?.id!);
     return serverMembers.hasPermission(
@@ -937,11 +940,13 @@ function MessageContextMenu(props: MessageContextMenuProps) {
   };
 
   const showQuote = () => {
-    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId())
+      return false;
     return channel()?.canSendMessage(account.user()?.id!);
   };
   const showReply = () => {
-    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId())
+      return false;
     return channel()?.canSendMessage(account.user()?.id!);
   };
   const showReact = () => hasMessageId();
@@ -1042,11 +1047,15 @@ function MessageContextMenu(props: MessageContextMenuProps) {
             ]
           : []),
 
-        {
-          icon: "translate",
-          label: t("messageContextMenu.translateMessage"),
-          onClick: onTranslateClick
-        },
+        ...(hasContent()
+          ? [
+              {
+                icon: "translate",
+                label: t("messageContextMenu.translateMessage"),
+                onClick: onTranslateClick
+              }
+            ]
+          : []),
         ...(hasMessageId()
           ? [
               {
@@ -1166,7 +1175,7 @@ function MessageContextMenu(props: MessageContextMenuProps) {
                 onClick: () => copyToClipboard(props.message.id!)
               }
             ]
-          : []),
+          : [])
       ]}
     />
   );
@@ -1184,7 +1193,8 @@ const MessageReactHeader = (props: {
     const unicode = emojiShortcodeToUnicode(shortcode);
     const icon =
       unicode ||
-      (customEmoji && `${customEmoji.id}.${customEmoji.gif ? (customEmoji.webp ? "webp#a" : "gif") : "webp"}`);
+      (customEmoji &&
+        `${customEmoji.id}.${customEmoji.gif ? (customEmoji.webp ? "webp#a" : "gif") : "webp"}`);
     return icon;
   };
 
