@@ -130,7 +130,9 @@ function roundDuration(
 // Format a message timestamp
 export function formatTimestamp(timestampMs: number, seconds = false) {
   const today = Temporal.Now.zonedDateTimeISO();
-  const timestamp = Temporal.Instant.fromEpochMilliseconds(timestampMs)
+  const timestamp = Temporal.Instant.fromEpochMilliseconds(
+    Math.round(timestampMs)
+  )
     .toZonedDateTimeISO(today.timeZoneId)
     .round({
       roundingMode: "trunc",
@@ -160,7 +162,7 @@ export function formatTimestamp(timestampMs: number, seconds = false) {
 
 export const fullDate = (timestamp: number) => {
   const datetime = Temporal.Instant.fromEpochMilliseconds(
-    timestamp
+    Math.round(timestamp)
   ).toZonedDateTimeISO(Temporal.Now.timeZoneId());
   return formatters().datetime.longDate.format(datetime.toPlainDate());
 };
@@ -168,7 +170,7 @@ export const fullDate = (timestamp: number) => {
 export function getDaysAgo(timestamp: number) {
   const now = Temporal.Now.zonedDateTimeISO();
   const start = Temporal.Instant.fromEpochMilliseconds(
-    timestamp
+    Math.round(timestamp)
   ).toZonedDateTimeISO(now.timeZoneId);
   const elapsed = start.until(now, {
     smallestUnit: "day"
@@ -184,7 +186,7 @@ export function getDaysAgo(timestamp: number) {
 export function timeSince(timestamp: number, timestampFallback = true) {
   const now = Temporal.Now.zonedDateTimeISO();
   const start = Temporal.Instant.fromEpochMilliseconds(
-    timestamp
+    Math.round(timestamp)
   ).toZonedDateTimeISO(now.timeZoneId);
   const elapsed = start.until(now, {
     largestUnit: "day",
@@ -212,7 +214,7 @@ export function timeSince(timestamp: number, timestampFallback = true) {
  */
 export function timeSinceDigital(timestamp: number) {
   const now = Temporal.Now.instant();
-  const start = Temporal.Instant.fromEpochMilliseconds(timestamp);
+  const start = Temporal.Instant.fromEpochMilliseconds(Math.round(timestamp));
   const elapsed = start.until(now, {
     largestUnit: "hour",
     smallestUnit: "second",
@@ -238,7 +240,9 @@ export function formatMillisElapsedDigital(milliseconds: number) {
  * This will return "0s" when the duration is empty.
  */
 export function formatMillisRemainingNarrow(millis: number) {
-  const duration = Temporal.Duration.from({ milliseconds: millis });
+  const duration = Temporal.Duration.from({
+    milliseconds: Math.round(millis)
+  });
   const rounded = roundDuration(duration, undefined, {
     roundingMode: "ceil",
     largestUnit: "hour"
@@ -281,7 +285,7 @@ function activityMusicTimeElapsed(
 function activityStatusDuration(startTime: number) {
   const now = Temporal.Now.zonedDateTimeISO();
   const start = Temporal.Instant.fromEpochMilliseconds(
-    startTime
+    Math.round(startTime)
   ).toZonedDateTimeISO(now.timeZoneId);
   let elapsed = start.until(now, {
     largestUnit: "years"
@@ -309,7 +313,7 @@ export function formatTimestampRelative(
 ) {
   const now = Temporal.Now.zonedDateTimeISO();
   const start = Temporal.Instant.fromEpochMilliseconds(
-    timestamp
+    Math.round(timestamp)
   ).toZonedDateTimeISO(now.timeZoneId);
   let elapsed = start.until(now, {
     largestUnit: "years"
