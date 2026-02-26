@@ -1030,11 +1030,15 @@ function MessageContextMenu(props: MessageContextMenuProps) {
             ]
           : []),
 
-        {
-          icon: "translate",
-          label: t("messageContextMenu.translateMessage"),
-          onClick: onTranslateClick
-        },
+        ...(hasContent()
+          ? [
+              {
+                icon: "translate",
+                label: t("messageContextMenu.translateMessage"),
+                onClick: onTranslateClick
+              }
+            ]
+          : []),
         {
           icon: "mark_chat_unread",
           label: t("messageContextMenu.markUnread"),
