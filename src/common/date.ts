@@ -129,53 +129,68 @@ function roundDuration(
 
 // Format a message timestamp
 export function formatTimestamp(timestampMs: number, seconds = false) {
-  const today = Temporal.Now.zonedDateTimeISO();
-  const timestamp = Temporal.Instant.fromEpochMilliseconds(
-    Math.round(timestampMs)
-  )
-    .toZonedDateTimeISO(today.timeZoneId)
-    .round({
-      roundingMode: "trunc",
-      smallestUnit: "second"
-    });
+  try {
+    const today = Temporal.Now.zonedDateTimeISO();
+    const timestamp = Temporal.Instant.fromEpochMilliseconds(
+      Math.round(timestampMs)
+    )
+      .toZonedDateTimeISO(today.timeZoneId)
+      .round({
+        roundingMode: "trunc",
+        smallestUnit: "second"
+      });
 
-  const yesterday = today.subtract(Temporal.Duration.from({ days: 1 }));
-  const date = timestamp.toPlainDate();
+    const yesterday = today.subtract(Temporal.Duration.from({ days: 1 }));
+    const date = timestamp.toPlainDate();
 
-  const dateFormat = formatters().datetime.mediumDate;
-  const timeFormatSeconds = formatters().datetime.seconds;
+    const dateFormat = formatters().datetime.mediumDate;
+    const timeFormatSeconds = formatters().datetime.seconds;
 
-  if (date.equals(today.toPlainDate())) {
-    const formatter = seconds ? timeFormatSeconds : dateFormat;
-    return formatter.format(timestamp.toPlainTime());
-  } else if (date.equals(yesterday.toPlainDate())) {
-    return t("datetime.yesterdayTime", {
-      time: dateFormat.format(timestamp.toPlainTime())
-    });
-  } else {
-    return t("datetime.dateTime", {
-      date: dateFormat.format(timestamp.toPlainDate()),
-      time: dateFormat.format(timestamp.toPlainTime())
-    });
+    if (date.equals(today.toPlainDate())) {
+      const formatter = seconds ? timeFormatSeconds : dateFormat;
+      return formatter.format(timestamp.toPlainTime());
+    } else if (date.equals(yesterday.toPlainDate())) {
+      return t("datetime.yesterdayTime", {
+        time: dateFormat.format(timestamp.toPlainTime())
+      });
+    } else {
+      return t("datetime.dateTime", {
+        date: dateFormat.format(timestamp.toPlainDate()),
+        time: dateFormat.format(timestamp.toPlainTime())
+      });
+    }
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
   }
 }
 
 export const fullDate = (timestamp: number) => {
-  const datetime = Temporal.Instant.fromEpochMilliseconds(
-    Math.round(timestamp)
-  ).toZonedDateTimeISO(Temporal.Now.timeZoneId());
-  return formatters().datetime.longDate.format(datetime.toPlainDate());
+  try {
+    const datetime = Temporal.Instant.fromEpochMilliseconds(
+      Math.round(timestamp)
+    ).toZonedDateTimeISO(Temporal.Now.timeZoneId());
+    return formatters().datetime.longDate.format(datetime.toPlainDate());
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
+  }
 };
 
 export function getDaysAgo(timestamp: number) {
-  const now = Temporal.Now.zonedDateTimeISO();
-  const start = Temporal.Instant.fromEpochMilliseconds(
-    Math.round(timestamp)
-  ).toZonedDateTimeISO(now.timeZoneId);
-  const elapsed = start.until(now, {
-    smallestUnit: "day"
-  });
-  return formatters().relative.format(-elapsed.days, "day");
+  try {
+    const now = Temporal.Now.zonedDateTimeISO();
+    const start = Temporal.Instant.fromEpochMilliseconds(
+      Math.round(timestamp)
+    ).toZonedDateTimeISO(now.timeZoneId);
+    const elapsed = start.until(now, {
+      smallestUnit: "day"
+    });
+    return formatters().relative.format(-elapsed.days, "day");
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
+  }
 }
 
 /**
@@ -184,28 +199,33 @@ export function getDaysAgo(timestamp: number) {
  * a day unless `timestampFallback` is `false`.
  */
 export function timeSince(timestamp: number, timestampFallback = true) {
-  const now = Temporal.Now.zonedDateTimeISO();
-  const start = Temporal.Instant.fromEpochMilliseconds(
-    Math.round(timestamp)
-  ).toZonedDateTimeISO(now.timeZoneId);
-  const elapsed = start.until(now, {
-    largestUnit: "day",
-    roundingMode: "trunc"
-  });
+  try {
+    const now = Temporal.Now.zonedDateTimeISO();
+    const start = Temporal.Instant.fromEpochMilliseconds(
+      Math.round(timestamp)
+    ).toZonedDateTimeISO(now.timeZoneId);
+    const elapsed = start.until(now, {
+      largestUnit: "day",
+      roundingMode: "trunc"
+    });
 
-  if (elapsed.days < 1 || !timestampFallback) {
-    const formatter = formatters().relative;
-    if (elapsed.days) {
-      return formatter.format(-elapsed.days, "day");
-    } else if (elapsed.hours) {
-      return formatter.format(-elapsed.hours, "hour");
-    } else if (elapsed.minutes) {
-      return formatter.format(-elapsed.minutes, "minute");
+    if (elapsed.days < 1 || !timestampFallback) {
+      const formatter = formatters().relative;
+      if (elapsed.days) {
+        return formatter.format(-elapsed.days, "day");
+      } else if (elapsed.hours) {
+        return formatter.format(-elapsed.hours, "hour");
+      } else if (elapsed.minutes) {
+        return formatter.format(-elapsed.minutes, "minute");
+      } else {
+        return t("datetime.lessThanAMinuteAgo");
+      }
     } else {
-      return t("datetime.lessThanAMinuteAgo");
+      return formatTimestamp(timestamp);
     }
-  } else {
-    return formatTimestamp(timestamp);
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
   }
 }
 
@@ -213,26 +233,36 @@ export function timeSince(timestamp: number, timestampFallback = true) {
  * Formats the duration since a timestamp as a digital clock, rounding down.
  */
 export function timeSinceDigital(timestamp: number) {
-  const now = Temporal.Now.instant();
-  const start = Temporal.Instant.fromEpochMilliseconds(Math.round(timestamp));
-  const elapsed = start.until(now, {
-    largestUnit: "hour",
-    smallestUnit: "second",
-    roundingMode: "floor"
-  });
-  return formatters().duration.digital.format(elapsed);
+  try {
+    const now = Temporal.Now.instant();
+    const start = Temporal.Instant.fromEpochMilliseconds(Math.round(timestamp));
+    const elapsed = start.until(now, {
+      largestUnit: "hour",
+      smallestUnit: "second",
+      roundingMode: "floor"
+    });
+    return formatters().duration.digital.format(elapsed);
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
+  }
 }
 
 export function formatMillisElapsedDigital(milliseconds: number) {
-  const duration = Temporal.Duration.from({
-    milliseconds: Math.round(milliseconds)
-  });
-  const rounded = duration.round({
-    largestUnit: "hour",
-    smallestUnit: "second",
-    roundingMode: "floor"
-  });
-  return formatters().duration.digitalShort.format(rounded);
+  try {
+    const duration = Temporal.Duration.from({
+      milliseconds: Math.round(milliseconds)
+    });
+    const rounded = duration.round({
+      largestUnit: "hour",
+      smallestUnit: "second",
+      roundingMode: "floor"
+    });
+    return formatters().duration.digitalShort.format(rounded);
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
+  }
 }
 
 /**
@@ -240,17 +270,22 @@ export function formatMillisElapsedDigital(milliseconds: number) {
  * This will return "0s" when the duration is empty.
  */
 export function formatMillisRemainingNarrow(millis: number) {
-  const duration = Temporal.Duration.from({
-    milliseconds: Math.round(millis)
-  });
-  const rounded = roundDuration(duration, undefined, {
-    roundingMode: "ceil",
-    largestUnit: "hour"
-  });
-  const formatter = rounded.secondsOnly
-    ? formatters().duration.narrowForceSeconds
-    : formatters().duration.narrow;
-  return formatter.format(rounded.duration);
+  try {
+    const duration = Temporal.Duration.from({
+      milliseconds: Math.round(millis)
+    });
+    const rounded = roundDuration(duration, undefined, {
+      roundingMode: "ceil",
+      largestUnit: "hour"
+    });
+    const formatter = rounded.secondsOnly
+      ? formatters().duration.narrowForceSeconds
+      : formatters().duration.narrow;
+    return formatter.format(rounded.duration);
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
+  }
 }
 
 export function calculateTimeElapsedForActivityStatus(
@@ -259,10 +294,15 @@ export function calculateTimeElapsedForActivityStatus(
   speed = 1,
   updatedAt?: number
 ) {
-  if (music) {
-    return activityMusicTimeElapsed(startTime, speed, updatedAt);
+  try {
+    if (music) {
+      return activityMusicTimeElapsed(startTime, speed, updatedAt);
+    }
+    return activityStatusDuration(startTime);
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
   }
-  return activityStatusDuration(startTime);
 }
 
 function activityMusicTimeElapsed(
@@ -311,34 +351,39 @@ export function formatTimestampRelative(
   timestamp: number,
   mode?: RelativeMode
 ) {
-  const now = Temporal.Now.zonedDateTimeISO();
-  const start = Temporal.Instant.fromEpochMilliseconds(
-    Math.round(timestamp)
-  ).toZonedDateTimeISO(now.timeZoneId);
-  let elapsed = start.until(now, {
-    largestUnit: "years"
-  });
+  try {
+    const now = Temporal.Now.zonedDateTimeISO();
+    const start = Temporal.Instant.fromEpochMilliseconds(
+      Math.round(timestamp)
+    ).toZonedDateTimeISO(now.timeZoneId);
+    let elapsed = start.until(now, {
+      largestUnit: "years"
+    });
 
-  const inFuture = elapsed.sign == -1;
-  if (inFuture) {
-    elapsed = elapsed.negated();
-  }
-  const rounded = roundDuration(elapsed, inFuture ? now : start, {
-    useWeeks: true
-  });
+    const inFuture = elapsed.sign == -1;
+    if (inFuture) {
+      elapsed = elapsed.negated();
+    }
+    const rounded = roundDuration(elapsed, inFuture ? now : start, {
+      useWeeks: true
+    });
 
-  if (rounded.secondsOnly && rounded.duration.seconds < 1) {
-    return t("datetime.relativeNow");
-  }
+    if (rounded.secondsOnly && rounded.duration.seconds < 1) {
+      return t("datetime.relativeNow");
+    }
 
-  const duration = formatters().duration.long.format(rounded.duration);
-  if (mode === "none") {
-    return duration;
-  } else if (mode === "duration") {
-    return t("datetime.duration", { duration });
-  } else if (inFuture) {
-    return t("datetime.relativeFuture", { duration });
-  } else {
-    return t("datetime.relativePast", { duration });
+    const duration = formatters().duration.long.format(rounded.duration);
+    if (mode === "none") {
+      return duration;
+    } else if (mode === "duration") {
+      return t("datetime.duration", { duration });
+    } else if (inFuture) {
+      return t("datetime.relativeFuture", { duration });
+    } else {
+      return t("datetime.relativePast", { duration });
+    }
+  } catch (e) {
+    console.warn(e);
+    return t("datetime.error");
   }
 }

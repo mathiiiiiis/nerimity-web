@@ -1350,6 +1350,7 @@
     "relativePast": "{{duration}} ago",
     "relativeNow": "now",
     "yesterdayTime": "Yesterday at {{time}}",
-    "dateTime": "{{date}} at {{time}}"
+    "dateTime": "{{date}} at {{time}}",
+    "error": "error"
   }
 }
