@@ -16,7 +16,7 @@ import {
   unpinMessage
 } from "@/chat-api/services/MessageService";
 import socketClient from "@/chat-api/socketClient";
-import { Message } from "@/chat-api/store/useMessages";
+import { Message, MessageSentStatus } from "@/chat-api/store/useMessages";
 import useStore from "@/chat-api/store/useStore";
 import {
   emitScrollToMessage,
@@ -872,10 +872,13 @@ function MessageContextMenu(props: MessageContextMenuProps) {
 
   const channel = () => channels.get(props.message.channelId!);
 
+  const hasMessageId = () => !props.message.local && props.message.sentStatus === undefined;
+  const sendFailed = () => props.message.sentStatus === MessageSentStatus.FAILED;
+
   const onDeleteClick = (e?: MouseEvent) => {
     createPortal?.((close) => (
       <DeleteMessageModal
-        instant={e?.shiftKey}
+        instant={e?.shiftKey || sendFailed() || props.message.local}
         close={close}
         message={props.message}
       />
@@ -908,9 +911,11 @@ function MessageContextMenu(props: MessageContextMenuProps) {
 
   const showEdit = () =>
     account.user()?.id === props.message.createdBy.id &&
-    props.message.type === MessageType.CONTENT;
+    props.message.type === MessageType.CONTENT &&
+    hasMessageId();
 
   const showDelete = () => {
+    if (sendFailed()) return true;
     if (account.user()?.id === props.message.createdBy.id) return true;
     if (!params.serverId) return false;
 
@@ -922,7 +927,7 @@ function MessageContextMenu(props: MessageContextMenuProps) {
   };
 
   const showPin = () => {
-    if (props.message.type !== MessageType.CONTENT) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
     if (!params.serverId) return true;
     const member = serverMembers.get(params.serverId, account.user()?.id!);
     return serverMembers.hasPermission(
@@ -932,18 +937,19 @@ function MessageContextMenu(props: MessageContextMenuProps) {
   };
 
   const showQuote = () => {
-    if (props.message.type !== MessageType.CONTENT) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
     return channel()?.canSendMessage(account.user()?.id!);
   };
   const showReply = () => {
-    if (props.message.type !== MessageType.CONTENT) return false;
+    if (props.message.type !== MessageType.CONTENT || !hasMessageId()) return false;
     return channel()?.canSendMessage(account.user()?.id!);
   };
+  const showReact = () => hasMessageId();
 
   const hasReactions = () => props.message?.reactions.length;
   const hasContent = () => props.message.content;
   const isSelfMessage = () => account.user()?.id === props.message.createdBy.id;
-  const showReportMessage = () => !isSelfMessage();
+  const showReportMessage = () => !isSelfMessage() && !props.message.local;
 
   const onMarkUnreadClick = () => {
     markMessageUnread({
@@ -1015,13 +1021,15 @@ function MessageContextMenu(props: MessageContextMenuProps) {
       triggerClassName="floatingShowMore"
       {...props}
       header={
-        <MessageReactHeader
-          addReaction={(shortcode: string) => {
-            props.addReaction(shortcode, props.message);
-            props.onClose?.();
-          }}
-          openReactPicker={(ev: MouseEvent) => onReactPickerClick(ev)}
-        />
+        <Show when={showReact()}>
+          <MessageReactHeader
+            addReaction={(shortcode: string) => {
+              props.addReaction(shortcode, props.message);
+              props.onClose?.();
+            }}
+            openReactPicker={(ev: MouseEvent) => onReactPickerClick(ev)}
+          />
+        </Show>
       }
       items={[
         ...(hasReactions()
@@ -1039,11 +1047,15 @@ function MessageContextMenu(props: MessageContextMenuProps) {
           label: t("messageContextMenu.translateMessage"),
           onClick: onTranslateClick
         },
-        {
-          icon: "mark_chat_unread",
-          label: t("messageContextMenu.markUnread"),
-          onClick: onMarkUnreadClick
-        },
+        ...(hasMessageId()
+          ? [
+              {
+                icon: "mark_chat_unread",
+                label: t("messageContextMenu.markUnread"),
+                onClick: onMarkUnreadClick
+              }
+            ]
+          : []),
         showPin()
           ? {
               icon: "keep",
@@ -1103,21 +1115,26 @@ function MessageContextMenu(props: MessageContextMenuProps) {
           : []),
 
         { separator: true },
-        {
-          icon: "link",
-          label: t("messageContextMenu.copyMessageLink")!,
-          onClick: () => {
-            const channel = channels.get(props.message.channelId!);
-            if (channel?.serverId) {
-              return copyToClipboard(
-                `${env.APP_URL}/app/servers/${channel.serverId}/${channel.id}?messageId=${props.message.id}`
-              );
-            }
-            return copyToClipboard(
-              `${env.APP_URL}/app/inbox/${channel?.id}?messageId=${props.message.id}`
-            );
-          }
-        },
+
+        ...(hasMessageId()
+          ? [
+              {
+                icon: "link",
+                label: t("messageContextMenu.copyMessageLink")!,
+                onClick: () => {
+                  const channel = channels.get(props.message.channelId!);
+                  if (channel?.serverId) {
+                    return copyToClipboard(
+                      `${env.APP_URL}/app/servers/${channel.serverId}/${channel.id}?messageId=${props.message.id}`
+                    );
+                  }
+                  return copyToClipboard(
+                    `${env.APP_URL}/app/inbox/${channel?.id}?messageId=${props.message.id}`
+                  );
+                }
+              }
+            ]
+          : []),
 
         ...(hasContent()
           ? [
@@ -1140,11 +1157,16 @@ function MessageContextMenu(props: MessageContextMenuProps) {
               }
             ]
           : []),
-        {
-          icon: "content_copy",
-          label: t("general.copyID")!,
-          onClick: () => copyToClipboard(props.message.id!)
-        }
+
+        ...(hasMessageId()
+          ? [
+              {
+                icon: "content_copy",
+                label: t("general.copyID")!,
+                onClick: () => copyToClipboard(props.message.id!)
+              }
+            ]
+          : []),
       ]}
     />
   );
