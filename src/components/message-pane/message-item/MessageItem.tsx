@@ -109,7 +109,7 @@ const DeleteMessageModal = lazy(
 );
 
 interface FloatingOptionsProps {
-  message: RawMessage;
+  message: Message;
   isCompact?: boolean | number;
   showContextMenu?: (event: MouseEvent) => void;
   reactionPickerClick?(event: MouseEvent): void;
@@ -121,6 +121,9 @@ function FloatOptions(props: FloatingOptionsProps) {
   const { account, serverMembers, channelProperties, channels } = useStore();
   const { createPortal } = useCustomPortal();
 
+  const hasMessageId = () => !props.message.local && props.message.sentStatus === undefined;
+  const sendFailed = () => props.message.sentStatus === MessageSentStatus.FAILED;
+
   const replyClick = () => {
     channelProperties.addReply(props.message.channelId, props.message);
     props.textAreaEl?.focus();
@@ -128,7 +131,7 @@ function FloatOptions(props: FloatingOptionsProps) {
   const onDeleteClick = (e: MouseEvent) => {
     createPortal?.((close) => (
       <DeleteMessageModal
-        instant={e.shiftKey}
+        instant={e.shiftKey || sendFailed() || props.message.local}
         close={close}
         message={props.message}
       />
@@ -140,9 +143,11 @@ function FloatOptions(props: FloatingOptionsProps) {
   };
   const showEdit = () =>
     account.user()?.id === props.message.createdBy.id &&
-    props.message.type === MessageType.CONTENT;
+    props.message.type === MessageType.CONTENT &&
+    hasMessageId();
 
   const showDelete = () => {
+    if (sendFailed() || props.message.local) return true;
     if (account.user()?.id === props.message.createdBy.id) return true;
     if (!params.serverId) return false;
 
@@ -154,10 +159,13 @@ function FloatOptions(props: FloatingOptionsProps) {
   };
 
   const showReply = () => {
+    if (!hasMessageId()) return false;
     if (props.message.type !== MessageType.CONTENT) return false;
     const channel = channels.get(props.message.channelId!);
     return channel?.canSendMessage(account.user()?.id!);
   };
+
+  const showReact = () => hasMessageId();
 
   return (
     <div class={cn(styles.floatOptions, "floatOptions")}>
@@ -166,9 +174,11 @@ function FloatOptions(props: FloatingOptionsProps) {
           {formatTimestamp(props.message.createdAt)}
         </div>
       )}
-      <div class={styles.item} onClick={props.reactionPickerClick}>
-        <Icon size={18} name="face" class={styles.icon} />
-      </div>
+      <Show when={showReact()}>
+        <div class={styles.item} onClick={props.reactionPickerClick}>
+          <Icon size={18} name="face" class={styles.icon} />
+        </div>
+      </Show>
       <Show when={showReply()}>
         <div class={styles.item} onClick={replyClick}>
           <Icon size={18} name="reply" class={styles.icon} />
@@ -394,6 +404,8 @@ const MessageItem = (props: MessageItemProps) => {
     isDateUnderFiveMinutes() &&
     isBeforeMessageContent();
 
+  const isSending = () => props.message.sentStatus === MessageSentStatus.SENDING;
+
   const [isMentioned, setIsMentioned] = createSignal(false);
   const [isSomeoneMentioned, setIsSomeoneMentioned] = createSignal(false);
   const [blockedMessage, setBlockedMessage] = createSignal(false);
@@ -538,7 +550,7 @@ const MessageItem = (props: MessageItemProps) => {
             <Icon name="edit" size={24} color="var(--success-color)" />
           </Show>
         </div>
-        <Show when={!props.hideFloating && hovered()}>
+        <Show when={!props.hideFloating && hovered() && !isSending()}>
           <FloatOptions
             textAreaEl={props.textAreaEl}
             reactionPickerClick={props.reactionPickerClick}
