@@ -872,9 +872,13 @@ function MessageContextMenu(props: MessageContextMenuProps) {
 
   const channel = () => channels.get(props.message.channelId!);
 
-  const onDeleteClick = () => {
+  const onDeleteClick = (e?: MouseEvent) => {
     createPortal?.((close) => (
-      <DeleteMessageModal close={close} message={props.message} />
+      <DeleteMessageModal
+        instant={e?.shiftKey}
+        close={close}
+        message={props.message}
+      />
     ));
   };
 
