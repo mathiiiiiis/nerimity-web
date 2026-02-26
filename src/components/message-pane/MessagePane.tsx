@@ -84,7 +84,7 @@ import { prettyBytes } from "@/common/prettyBytes";
 import Checkbox from "../ui/Checkbox";
 import { ChannelIcon } from "../ChannelIcon";
 import { MetaTitle } from "@/common/MetaTitle";
-import { millisecondsToReadable, timeSinceMentions } from "@/common/date";
+import { formatMillisRemainingNarrow, formatTimestampRelative } from "@/common/date";
 import { useResizeObserver } from "@/common/useResizeObserver";
 import DropDown, { DropDownItem } from "../ui/drop-down/DropDown";
 import { useCustomScrollbar } from "../custom-scrollbar/CustomScrollbar";
@@ -276,9 +276,9 @@ const MutedNotice = (props: { member: ServerMember }) => {
   const [expiresAt, setExpiresAt] = createSignal<string>("");
 
   const updateExpiresAt = () => {
-    const text = timeSinceMentions(props.member.muteExpireAt!);
-
-    setExpiresAt(text.slice(3));
+    setExpiresAt(
+      formatTimestampRelative(props.member.muteExpireAt ?? 0, "none")
+    );
   };
 
   createEffect(
@@ -1125,9 +1125,9 @@ function SlowModeIndicator() {
   const [currentSlowModeMs, setCurrentSlowModeMs] = createSignal(0);
 
   const toMs = () => channel()?.slowModeSeconds! * 1000;
-  const toReadable = () => millisecondsToReadable(toMs());
+  const toReadable = () => formatMillisRemainingNarrow(toMs());
 
-  const readableRemainingMs = () => millisecondsToReadable(currentSlowModeMs());
+  const readableRemainingMs = () => formatMillisRemainingNarrow(currentSlowModeMs());
 
   createEffect(() => {
     if (!slowDownProperties() || isAdmin()) {
@@ -1171,9 +1171,14 @@ function SlowModeIndicator() {
           currentSlowModeMs() ? "var(--alert-color)" : "var(--primary-color)"
         }
       />
-      <Text opacity={0.8} size={10} title={toReadable()}>
+      <Text
+        opacity={0.8}
+        size={10}
+        title={toReadable()}
+        style={{ "font-variant-numeric": "tabular-nums" }}
+      >
         {t("messageView.slowMode")}
-        {` ${currentSlowModeMs() ? `(${readableRemainingMs() || "0s"})` : ""}`}
+        {" " + (currentSlowModeMs() ? `(${readableRemainingMs()})` : "")}
       </Text>
     </Floating>
   );
