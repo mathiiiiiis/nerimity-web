@@ -1350,6 +1350,7 @@
         "relativePast": "{{duration}} таму",
         "relativeNow": "зараз",
         "yesterdayTime": "Учора а {{time}}",
-        "dateTime": "{{date}} а {{time}}"
+        "dateTime": "{{date}} а {{time}}",
+        "error": "памылка"
     }
 }
