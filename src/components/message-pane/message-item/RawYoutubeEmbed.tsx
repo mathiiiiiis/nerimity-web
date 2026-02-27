@@ -11,7 +11,7 @@ export const RawYoutubeEmbed = (props: {
   const [playVideo, setPlayVideo] = createSignal<boolean>(false);
 
   const thumbnailUrl = () => {
-    return `https://i.ytimg.com/vi/${props.code}/hqdefault.webp`;
+    return `https://i.ytimg.com/vi_webp/${props.code}/hqdefault.webp`;
   };
 
   return (
