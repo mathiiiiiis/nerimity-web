@@ -6,12 +6,12 @@ export const RawYoutubeEmbed = (props: {
   code: string;
   embed: RawEmbed;
   shorts: boolean;
-  style?: JSX.CSSProperties
+  style?: JSX.CSSProperties;
 }) => {
   const [playVideo, setPlayVideo] = createSignal<boolean>(false);
 
   const thumbnailUrl = () => {
-    return `https://i.ytimg.com/vi/${props.code}/maxresdefault.jpg`;
+    return `https://i.ytimg.com/vi/${props.code}/hqdefault.webp`;
   };
 
   return (
