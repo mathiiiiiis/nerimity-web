@@ -132,7 +132,16 @@
             "linkButton": "Vincular ahora",
             "cancelButton": "No vincules"
         },
-        "emailNotice": "Confirma tu correo para enviar mensajes."
+        "emailNotice": "Confirma tu correo para enviar mensajes.",
+        "gifPicker": {
+            "search": "Buscar {{platform}}",
+            "noResults": "No se han encontrado GIFs",
+            "favorites": {
+                "title": "Favoritos",
+                "search": "Buscar favoritos",
+                "noFavorites": "No tienes gifs favoritos"
+            }
+        }
     },
     "inbox": {
         "blockedUsersModal": {
@@ -567,7 +576,9 @@
             "testNotification": {
                 "title": "Ha funcionado!",
                 "body": "Notificaciones de escritorio activadas."
-            }
+            },
+            "callJoin": "Unirse a llamada",
+            "callLeave": "Salirse de llamada"
         },
         "call": {
             "nextCallNotice": "Los cambios serán aplicados en tus próximas llamadas.",
@@ -581,7 +592,17 @@
             "bindButton": "Asignar",
             "stopButton": "Detener",
             "downloadAppNotice": "Descarga la aplicación de escritorio de Nerimity para usar esta función sin necesidad de que la ventana esté activa.",
-            "leaveCall": "Tienes que salirte de la llamada primero"
+            "leaveCall": "Tienes que salirte de la llamada primero",
+            "inputConstraints": {
+                "echoCancelation": "Cancelación de eco",
+                "echoCancelationDescription": "Evita que el micrófono capte el sonido de los altavoces.",
+                "noiseSuppression": "Supresión de ruido",
+                "noiseSuppressionDescription": "Filtra el ruido de fondo constante (ventiladores, zumbidos).",
+                "autoGainControl": "Control automático de volumen",
+                "autoGainControlDescription": "Ajusta automáticamente los niveles de volumen para mantener una señal constante."
+            },
+            "useTurn": "Utilizar servidores TURN de Cloudflare",
+            "useTurnDescription": "Utilizar servidores TURN para mejorar la conectividad"
         },
         "interface": {
             "customCSS": "CSS personalizado",
@@ -615,7 +636,9 @@
             "swipeToOpen": "Deslizar para abrir",
             "swipeToOpenDescription": "Desliza desde el borde derecho para abrir el panel derecho. Esto desactivará la función de deslizar para responder.",
             "headerTapToOpen": "Toca el encabezado para abrir",
-            "headerTapToOpenDescription": "Abre el panel derecho haciendo clic en el encabezado. Esto activará el deslizamiento para responder."
+            "headerTapToOpenDescription": "Abre el panel derecho haciendo clic en el encabezado. Esto activará el deslizamiento para responder.",
+            "reduceAnimations": "Reducir animaciones",
+            "reduceAnimationsDescription": "Evita que los GIF animados y los emojis se reproduzcan hasta que se pase el cursor por encima o se pulsen."
         },
         "window": {
             "downloadAppNotice": "Para modificar estos ajustes, tienes que descargarte la aplicación de escritorio de Nerimity.",
@@ -646,7 +669,11 @@
             "serverModal": {
                 "text": "Por favor, únete al servidor de Discord para poder activar la compartición de actividad.",
                 "doneButton": "Ya me he unido"
-            }
+            },
+            "lastfmActivity": "Actividad en Last.fm",
+            "lastfmActivityDescription": "Comparte lo que estás escuchando a través de Last.fm",
+            "lastfmUsernamePlaceholder": "Usuario de Last.fm",
+            "lastfmApiKeyPlaceholder": "Llave API de Last.fm"
         },
         "developer": {
             "oauth2": {
@@ -933,7 +960,8 @@
         "joiningButton": "Uniéndose…",
         "visitButton": "Visitar",
         "member": "miembro",
-        "members": "miembros"
+        "members": "miembros",
+        "privateEmoji": "Este emoji procede de un servidor privado."
     },
     "fileEmbed": {
         "expired": "Expirado en {{time}}",
@@ -1158,7 +1186,20 @@
             "leave": "Salirse",
             "muted": "Silenciado",
             "deafened": "Ensordecido",
-            "fullscreen": "Pantalla completa"
+            "fullscreen": "Pantalla completa",
+            "webcamModal": {
+                "title": "Compartir cámara",
+                "error": "No se pudo compartir la cámara",
+                "shareCameraButton": "Compartir cámara"
+            },
+            "screenShareModal": {
+                "title": "Compartir pantalla",
+                "quality": "Calidad",
+                "framerate": "Fotogramas",
+                "shareSystemAudio": "Compartir audio del sistema",
+                "shareAppAudio": "Compartir audio de la aplicación",
+                "chooseWindowButton": "Seleccionar ventana"
+            }
         }
     },
     "channelDrawer": {
@@ -1224,7 +1265,9 @@
             "avatar": "Avatar",
             "banner": "Banner",
             "supportedFileTypes": "Compatible: {{extensions}}, Max {{size}}",
-            "browse": "Navegar"
+            "browse": "Navegar",
+            "revert": "Revertir",
+            "remove": "Quitar"
         },
         "undoButton": "Deshacer",
         "editButton": "Editar",
@@ -1295,5 +1338,19 @@
         "message": "Establecer un recordatorio para",
         "setReminderButton": "Establecer recordatorio",
         "adding": "Añadiendo…"
+    },
+    "serverDrawer": {
+        "joinedThisSessionNotice": "Verás todas las notificaciones de este servidor.",
+        "joinedThisSessionNoticeSetToMentionsOnly": "Configurar para solo menciones"
+    },
+    "datetime": {
+        "lessThanAMinuteAgo": "hace unos segundos",
+        "duration": "durante {{duration}}",
+        "relativeFuture": "en {{duration}}",
+        "relativePast": "Hace {{duration}}",
+        "relativeNow": "ahora",
+        "yesterdayTime": "Ayer a las {{time}}",
+        "dateTime": "{{date}} a las {{time}}",
+        "error": "error"
     }
 }
