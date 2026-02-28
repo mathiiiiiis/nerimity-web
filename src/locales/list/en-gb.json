@@ -1351,6 +1351,7 @@
     "relativeNow": "now",
     "yesterdayTime": "Yesterday at {{time}}",
     "dateTime": "{{date}} at {{time}}",
-    "error": "error"
+    "error": "error",
+    "invalidTimezone": "invalid time zone"
   }
 }
