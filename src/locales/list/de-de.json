@@ -1341,6 +1341,15 @@
     },
     "serverDrawer": {
         "joinedThisSessionNoticeSetToMentionsOnly": "Nur bei Erwähnungen",
-        "joinedThisSessionNotice": "Du wirst alle Benachrichtigungstöne von diesem Server sehen."
+        "joinedThisSessionNotice": "Du wirst alle Benachrichtigungen von diesem Server sehen."
+    },
+    "datetime": {
+        "lessThanAMinuteAgo": "vor wenigen Sekunden",
+        "duration": "für {{duration}}",
+        "relativeFuture": "in {{duration}}",
+        "relativePast": "vor {{duration}}",
+        "relativeNow": "jetzt",
+        "yesterdayTime": "Gestern um {{time}}",
+        "dateTime": "{{date}} um {{time}}"
     }
 }

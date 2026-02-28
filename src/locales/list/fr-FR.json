@@ -587,7 +587,11 @@
             "serverModal": {
                 "text": "Veuillez rejoindre le serveur Discord pour activer le partage d'activité.",
                 "doneButton": "j'ai rejoint"
-            }
+            },
+            "lastfmActivity": "Activité Last.fm",
+            "lastfmActivityDescription": "Partage ce que tu écoutes via Last.fm",
+            "lastfmUsernamePlaceholder": "Nom d'utilisateur Last.fm",
+            "lastfmApiKeyPlaceholder": "Clé d'API Last.fm"
         },
         "developer": {
             "oauth2": {
@@ -1338,5 +1342,15 @@
     "serverDrawer": {
         "joinedThisSessionNoticeSetToMentionsOnly": "Mentions uniquement",
         "joinedThisSessionNotice": "Vous entendrez tous les sons de notifications de ce serveur."
+    },
+    "datetime": {
+        "lessThanAMinuteAgo": "il y a quelques secondes",
+        "duration": "pour {{duration}}",
+        "relativeFuture": "dans {{duration}}",
+        "relativePast": "il y a {{duration}}",
+        "relativeNow": "maintenant",
+        "yesterdayTime": "Hier à {{time}}",
+        "dateTime": "{{date}} à {{time}}",
+        "error": "erreur"
     }
 }

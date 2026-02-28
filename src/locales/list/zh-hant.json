@@ -214,5 +214,16 @@
         "replyInputPlaceholder": "回覆...",
         "replyButton": "回覆",
         "createButton": "建立"
+    },
+    "general": {
+        "backButton": "返回",
+        "cancelButton": "取消",
+        "deleteButton": "刪除",
+        "confirmButton": "確定",
+        "accountData": {
+            "email": "郵箱",
+            "username": "用戶名",
+            "password": "密碼"
+        }
     }
 }
