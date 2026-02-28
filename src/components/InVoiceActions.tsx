@@ -8,7 +8,7 @@ import RouterEndpoints from "@/common/RouterEndpoints";
 import { CustomLink } from "./ui/CustomLink";
 import { timeSinceDigital } from "@/common/date";
 import Button from "./ui/Button";
-import { Trans, useTransContext } from "@nerimity/solid-i18lite";
+import { Trans } from "@nerimity/solid-i18lite";
 
 const InVoiceActionsContainer = styled(FlexColumn)`
   background-color: rgb(15, 15, 15);
@@ -46,8 +46,6 @@ export default function InVoiceActions(props: { style?: JSX.CSSProperties }) {
     return RouterEndpoints.SERVER_MESSAGES(server()?.id!, channel()?.id!);
   };
 
-  const [t] = useTransContext();
-
   return (
     <Show when={channelId()}>
       <InVoiceActionsContainer style={props?.style}>
@@ -59,9 +57,7 @@ export default function InVoiceActions(props: { style?: JSX.CSSProperties }) {
             style={{ padding: "10px", "padding-right": "5px" }}
           />
           <DetailsContainer>
-            <Text size={12}>
-              <CallTime channelId={channelId()!} />
-            </Text>
+            <CallTime channelId={channelId()!} />
             <CustomLink
               href={href()}
               decoration
@@ -198,7 +194,6 @@ function CallTime(props: { channelId: string }) {
       <Text
         size={12}
         style={{
-          "margin-left": "auto",
           "font-variant-numeric": "tabular-nums"
         }}
       >
