@@ -699,7 +699,12 @@ const PollEmbed = (props: { post: Post; poll: RawPostPoll }) => {
       <div class={style.footer}>
         <span class={style.votes}>
           <Text size={12}>
-            {t("posts.voteCount", { count: props.poll._count.votedUsers })}
+            <Trans
+              key="posts.voteCount"
+              options={{ count: props.poll._count.votedUsers }}
+            >
+              <Text size={12} opacity={0.6}>{"count"}</Text> vote(s)
+            </Trans>
           </Text>
         </span>
 
