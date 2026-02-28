@@ -417,5 +417,16 @@
     "googleAccountLink": {
         "linking": "将您的账号与 Google 绑定...",
         "success": "账号绑定成功！您现在可以关闭该窗口。"
+    },
+    "general": {
+        "backButton": "返回",
+        "cancelButton": "取消",
+        "deleteButton": "删除",
+        "confirmButton": "确定",
+        "accountData": {
+            "email": "邮箱",
+            "username": "用户名",
+            "password": "密码"
+        }
     }
 }
