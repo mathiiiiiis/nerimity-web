@@ -1,4 +1,4 @@
-import { ChannelType } from "@/chat-api/RawData";
+import { ChannelType, FriendStatus } from "@/chat-api/RawData";
 import useStore from "@/chat-api/store/useStore";
 import { createContextProvider } from "@solid-primitives/context";
 import {
@@ -50,7 +50,8 @@ const [QuickTravelControllerProvider, useQuickTravelController] =
       const users = store.users.array();
 
       return users.map((user) => {
-        const friend = store.friends.get(user.id);
+        const friend =
+          store.friends.get(user.id)?.status === FriendStatus.FRIENDS;
         const inbox = user.inboxChannelId
           ? store.inbox.get(user.inboxChannelId)
           : undefined;
@@ -127,8 +128,12 @@ const [QuickTravelControllerProvider, useQuickTravelController] =
             const inboxA = "inbox" in a && !!a.inbox;
             const inboxB = "inbox" in b && !!b.inbox;
 
-            const friendA = "id" in a && !!store.friends.get(a.id!);
-            const friendB = "id" in b && !!store.friends.get(b.id!);
+            const friendA =
+              "id" in a &&
+              store.friends.get(a.id!)?.status === FriendStatus.FRIENDS;
+            const friendB =
+              "id" in b &&
+              store.friends.get(b.id!)?.status === FriendStatus.FRIENDS;
 
             if (inboxA && !inboxB) return -1;
             if (!inboxA && inboxB) return 1;
