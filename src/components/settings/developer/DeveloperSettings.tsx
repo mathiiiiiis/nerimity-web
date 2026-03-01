@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { styled } from "solid-styled-components";
 
 import useStore from "@/chat-api/store/useStore";
@@ -18,6 +18,21 @@ const Container = styled("div")`
 export default function DeveloperSettings() {
   const { header } = useStore();
 
+  const getInitialCookieValue = () => {
+    const match = document.cookie.split('; ').find(row => row.startsWith('useLatestURL='));
+    return match ? match.split('=')[1] === 'true' : false;
+  };
+
+  const [useLatest, setUseLatest] = createSignal(getInitialCookieValue());
+
+  const handleToggleCookie = (e: Event) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    setUseLatest(checked);
+    
+    const domain = window.location.hostname.includes("nerimity.com") ? "domain=.nerimity.com;" : "";
+    document.cookie = `useLatestURL=${checked}; path=/; max-age=315360000; ${domain}`;
+  };
+
   createEffect(() => {
     header.updateHeader({
       title: t("settings.drawer.title") + " - " + t("settings.drawer.developer"),
@@ -31,6 +46,20 @@ export default function DeveloperSettings() {
         <BreadcrumbItem href="/app" icon="home" title={t("dashboard.title")} />
         <BreadcrumbItem title={t("settings.drawer.developer")} />
       </Breadcrumb>
+
+      <SettingsBlock
+        icon="update"
+        label={t("settings.developer.useLatestUrl")}
+        description={t("settings.developer.useLatestUrlDescription")}
+        children={
+          <input 
+            type="checkbox" 
+            checked={useLatest()} 
+            onChange={handleToggleCookie} 
+            style={{ cursor: "pointer", width: "20px", height: "20px", margin: "0 8px" }}
+          />
+        }
+      />
 
       <SettingsBlock
         href="./applications"
