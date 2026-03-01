@@ -52,10 +52,11 @@ export default function DeveloperSettings() {
         label={t("settings.developer.useLatestUrl")}
         description={t("settings.developer.useLatestUrlDescription")}
         children={
-          <input 
-            type="checkbox" 
-            checked={useLatest()} 
-            onChange={handleToggleCookie} 
+          <input
+            type="checkbox"
+            aria-label={t("settings.developer.useLatestUrl")}
+            checked={useLatest()}
+            onChange={handleToggleCookie}
             style={{ cursor: "pointer", width: "20px", height: "20px", margin: "0 8px" }}
           />
         }
